@@ -1,3 +1,4 @@
+import json
 import os
 import re
 
@@ -16,11 +17,10 @@ def prepare_expression_file(expression):
 
 
 def get_no_models():
-    no_models = -1
     with open(output_file_name, 'r') as file:
-        for line in file:
-            if 'Exiting with' in line:
-                no_models = line.split()[2]
+        contents = file.read()
+        models = json.loads(contents)
+        no_models = len(models)
     file.close()
     return no_models
 
@@ -28,8 +28,11 @@ def get_no_models():
 def evaluate_fol_expression(expression):
     prepare_expression_file(expression)
 
-    os.system('mace4 -f {} {} {} > {}'.format(sensors_file_name, background_knowledge_file_name, expression_file_name,
-                                              output_file_name))
+    os.system(
+        'mace4 -f {} {} {} | interpformat standard | isofilter | interpformat portable > {}'.format(sensors_file_name,
+                                                                                                    background_knowledge_file_name,
+                                                                                                    expression_file_name,
+                                                                                                    output_file_name))
     no_models = get_no_models()
 
     os.system('rm {}'.format(output_file_name))
