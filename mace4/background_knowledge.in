@@ -1,0 +1,8 @@
+% mace4 -f sensors.in background_knowledge.in expression.in
+
+formulas(background_knowledge).
+  robot(x) -> -object(x).
+  box(x) -> object(x).
+  tool(x) -> object(x).
+  box(x) -> -tool(x).
+end_of_list.

@@ -1,0 +1,3 @@
+formulas(commands).
+	exists y (tool(y)).
+end_of_list.

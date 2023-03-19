@@ -1,0 +1,10 @@
+assign(domain_size, 4).
+assign(max_models, -1).
+set(arithmetic).
+
+formulas(sensors).
+  R1 = 0. B1 = 1. B2 = 2. T1 = 3.
+  robot(R1).
+  box(B1). box(B2).
+  tool(T1).
+end_of_list.
