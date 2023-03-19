@@ -1,2 +1,0 @@
-
-move(Robot, x) -> isReachable(x)
