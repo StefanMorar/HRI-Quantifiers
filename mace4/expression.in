@@ -1,3 +1,3 @@
 formulas(commands).
-	exists y (tool(y)).
+	exists x (tool(x)).
 end_of_list.

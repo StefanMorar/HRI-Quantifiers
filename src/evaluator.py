@@ -53,4 +53,4 @@ def evaluate_fol_cardinality_expression(expression):
         return -1
 
 
-print(evaluate_fol_cardinality_expression('|exists x (box(x)).| == 2 * |exists y (tool(y)).|'))
+# print(evaluate_fol_cardinality_expression('|exists x (box(x)).| == 2 * |exists x (tool(x)).|'))
