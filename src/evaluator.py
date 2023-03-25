@@ -52,5 +52,4 @@ def evaluate_fol_cardinality_expression(expression):
     except SyntaxError:
         return -1
 
-
 # print(evaluate_fol_cardinality_expression('|exists x (box(x)).| == 2 * |exists x (tool(x)).|'))

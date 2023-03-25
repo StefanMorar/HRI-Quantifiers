@@ -17,7 +17,12 @@ def get_predicate(tagged_token):
             return p.singular_noun(tagged_token[0])
 
 
-def generate_exists_expression(predicates):
+def get_tag_string(tagged_tokens):
+    return ''.join('<{}>'.format(tagged_token[1]) for tagged_token in tagged_tokens)
+
+
+def generate_exists_expression(tagged_tokens):
+    predicates = [get_predicate(t) for t in tagged_tokens]
     no_predicates = len(predicates)
     if no_predicates == 0:
         return ''
@@ -30,13 +35,15 @@ def generate_exists_expression(predicates):
 
 
 def validate_noun_phrase(tagged_tokens):
-    # check for <JJ>*<NNS>
-    return generate_exists_expression([get_predicate(t) for t in tagged_tokens])
+    noun_phrase_pattern = r'^(\<JJ\>)?\<NNS\>$'
+    return True if re.match(noun_phrase_pattern, get_tag_string(tagged_tokens)) else False
 
 
-def validate_quantifier(tagged_tokens):
+def generate_integer_quantifier(tagged_tokens):
     if tagged_tokens[0][0] == 'twice':
         return 2
+    if tagged_tokens[0][0] == 'thrice':
+        return 3
 
 
 def generate_predicate_comparison_expression(sentence):
@@ -45,9 +52,14 @@ def generate_predicate_comparison_expression(sentence):
     if match:
         quantifier = nltk.pos_tag(nltk.word_tokenize(match.group(1)))
         noun_phrase1 = nltk.pos_tag(nltk.word_tokenize(match.group(2)))
+        print(noun_phrase1)
         noun_phrase2 = nltk.pos_tag(nltk.word_tokenize(match.group(3)))
-        return '|{}| == {} * |{}|'.format(validate_noun_phrase(noun_phrase1), validate_quantifier(quantifier),
-                                          validate_noun_phrase(noun_phrase2))
+        if (not validate_noun_phrase(noun_phrase1)) | (not validate_noun_phrase(noun_phrase2)):
+            return None
+
+        return '|{}| == {} * |{}|'.format(generate_exists_expression(noun_phrase1),
+                                          generate_integer_quantifier(quantifier),
+                                          generate_exists_expression(noun_phrase2))
     else:
         return None
 
