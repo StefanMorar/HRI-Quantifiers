@@ -97,12 +97,13 @@ def generate_most_expression(match):
                                 generate_exists_expression(noun_phrase1, noun_phrase2, 1))
 
 
-def generate_numeric_expression(match):
+def generate_numeric_expression(match, operator):
     quantifier = nltk.pos_tag(nltk.word_tokenize(match.group(1)))
     noun_phrase = nltk.pos_tag(nltk.word_tokenize(match.group(2)))
     if (not validate_quantifier(quantifier)) | (not validate_noun_phrase(noun_phrase)):
         return None
-    return '|{}| == {}'.format(generate_exists_expression(noun_phrase, [], 1), get_numeric_digits(quantifier[0][0]))
+    return '|{}| {} {}'.format(generate_exists_expression(noun_phrase, [], 1), operator,
+                               get_numeric_digits(quantifier[0][0]))
 
 
 def generate_expression(sentence):
@@ -114,8 +115,20 @@ def generate_expression(sentence):
     if match:
         return generate_most_expression(match)
 
+    match = re.match(r'There are exactly ([a-zA-Z0-9]*) (.*)', sentence)
+    if match:
+        return generate_numeric_expression(match, '==')
+
+    match = re.match(r'There are at least ([a-zA-Z0-9]*) (.*)', sentence)
+    if match:
+        return generate_numeric_expression(match, '>=')
+
+    match = re.match(r'There are at most ([a-zA-Z0-9]*) (.*)', sentence)
+    if match:
+        return generate_numeric_expression(match, '<=')
+
     match = re.match(r'There are ([a-zA-Z0-9]*) (.*)', sentence)
     if match:
-        return generate_numeric_expression(match)
+        return generate_numeric_expression(match, '>=')
 
     return None
