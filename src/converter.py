@@ -3,8 +3,7 @@ from itertools import combinations
 
 import inflect
 import nltk
-
-from src.evaluator import evaluate_fol_cardinality_expression
+from word2number import w2n
 
 
 def get_predicate(tagged_token):
@@ -22,7 +21,7 @@ def get_tag_string(tagged_tokens):
     return ''.join('<{}>'.format(tagged_token[1]) for tagged_token in tagged_tokens)
 
 
-def generate_exists_expression2(positive_predicate_tagged_tokens, negative_predicate_tagged_tokens, no_variables):
+def generate_exists_expression(positive_predicate_tagged_tokens, negative_predicate_tagged_tokens, no_variables):
     signs = ['+'] * len(positive_predicate_tagged_tokens) + ['-'] * len(negative_predicate_tagged_tokens)
     predicates = [get_predicate(t) for t in positive_predicate_tagged_tokens + negative_predicate_tagged_tokens]
 
@@ -35,8 +34,7 @@ def generate_exists_expression2(positive_predicate_tagged_tokens, negative_predi
         for iterator in range(no_variables):
             partial_inner_expression = ' & '.join(
                 [('' if sign_predicate[1] == '+' else '-') + '{}(x{})'.format(sign_predicate[0], iterator) for
-                 sign_predicate in
-                 sign_predicates])
+                 sign_predicate in sign_predicates])
             if iterator == 0:
                 inner_expression = partial_inner_expression
             else:
@@ -59,6 +57,18 @@ def validate_noun_phrase(tagged_tokens):
     return True if re.match(noun_phrase_pattern, get_tag_string(tagged_tokens)) else False
 
 
+def validate_quantifier(tagged_tokens):
+    quantifier_pattern = r'^\<CD\>$'
+    return True if re.match(quantifier_pattern, get_tag_string(tagged_tokens)) else False
+
+
+def get_numeric_digits(word):
+    match = re.match(r'^[0-9]*$', word)
+    if match:
+        return int(word)
+    return w2n.word_to_num(word)
+
+
 def generate_integer_quantifier(tagged_tokens):
     if tagged_tokens[0][0] == 'twice':
         return 2
@@ -73,9 +83,9 @@ def generate_as_many_than_expression(match):
     if (not validate_noun_phrase(noun_phrase1)) | (not validate_noun_phrase(noun_phrase2)):
         return None
 
-    return '|{}| == {} * |{}|'.format(generate_exists_expression2(noun_phrase1, [], 1),
+    return '|{}| == {} * |{}|'.format(generate_exists_expression(noun_phrase1, [], 1),
                                       generate_integer_quantifier(quantifier),
-                                      generate_exists_expression2(noun_phrase2, [], 1))
+                                      generate_exists_expression(noun_phrase2, [], 1))
 
 
 def generate_most_expression(match):
@@ -83,24 +93,29 @@ def generate_most_expression(match):
     noun_phrase2 = nltk.pos_tag(nltk.word_tokenize(match.group(2)))
     if (not validate_noun_phrase(noun_phrase1)) | (not validate_noun_phrase(noun_phrase2)):
         return None
-    return '|{}| > |{}|'.format(generate_exists_expression2(noun_phrase1 + noun_phrase2, [], 1),
-                                generate_exists_expression2(noun_phrase1, noun_phrase2, 1))
+    return '|{}| > |{}|'.format(generate_exists_expression(noun_phrase1 + noun_phrase2, [], 1),
+                                generate_exists_expression(noun_phrase1, noun_phrase2, 1))
+
+
+def generate_numeric_expression(match):
+    quantifier = nltk.pos_tag(nltk.word_tokenize(match.group(1)))
+    noun_phrase = nltk.pos_tag(nltk.word_tokenize(match.group(2)))
+    if (not validate_quantifier(quantifier)) | (not validate_noun_phrase(noun_phrase)):
+        return None
+    return '|{}| == {}'.format(generate_exists_expression(noun_phrase, [], 1), get_numeric_digits(quantifier[0][0]))
 
 
 def generate_expression(sentence):
     match = re.match(r'There are (.*) as many (.*) than (.*)', sentence)
     if match:
         return generate_as_many_than_expression(match)
+
     match = re.match(r'Most (.*) are (.*)', sentence)
     if match:
         return generate_most_expression(match)
+
+    match = re.match(r'There are ([a-zA-Z0-9]*) (.*)', sentence)
+    if match:
+        return generate_numeric_expression(match)
+
     return None
-
-
-expression = generate_expression('There are twice as many boxes than tools')
-print(expression)
-print(evaluate_fol_cardinality_expression(expression))
-
-expression = generate_expression('Most objects are boxes')
-print(expression)
-print(evaluate_fol_cardinality_expression(expression))
