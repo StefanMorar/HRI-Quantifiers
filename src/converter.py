@@ -5,6 +5,12 @@ import inflect
 import nltk
 from word2number import w2n
 
+ambiguous_quantifiers = {
+    'many': 10,
+    'some': 2,
+    'few': 2
+}
+
 
 def get_predicate(tagged_token):
     match tagged_token[1]:
@@ -106,6 +112,22 @@ def generate_numeric_expression(match, operator):
                                get_numeric_digits(quantifier[0][0]))
 
 
+def generate_ambiguous_quantifier_expression(match, operator, quantifier):
+    noun_phrase = nltk.pos_tag(nltk.word_tokenize(match.group(1)))
+    if not validate_noun_phrase(noun_phrase):
+        return None
+    return '|{}| {} {}'.format(generate_exists_expression(noun_phrase, [], 1), operator, quantifier)
+
+
+def generate_more_expression(match, operator):
+    noun_phrase1 = nltk.pos_tag(nltk.word_tokenize(match.group(1)))
+    noun_phrase2 = nltk.pos_tag(nltk.word_tokenize(match.group(2)))
+    if (not validate_noun_phrase(noun_phrase1)) | (not validate_noun_phrase(noun_phrase2)):
+        return None
+    return '|{}| {} |{}|'.format(generate_exists_expression(noun_phrase1, [], 1), operator,
+                                 generate_exists_expression(noun_phrase2, [], 1))
+
+
 def generate_expression(sentence):
     match = re.match(r'There are (.*) as many (.*) than (.*)', sentence)
     if match:
@@ -126,6 +148,30 @@ def generate_expression(sentence):
     match = re.match(r'There are at most ([a-zA-Z0-9]*) (.*)', sentence)
     if match:
         return generate_numeric_expression(match, '<=')
+
+    match = re.match(r'There are more than ([a-zA-Z0-9]*) (.*)', sentence)
+    if match:
+        return generate_numeric_expression(match, '>')
+
+    match = re.match(r'There are less than ([a-zA-Z0-9]*) (.*)', sentence)
+    if match:
+        return generate_numeric_expression(match, '>')
+
+    match = re.match(r'There are more (.*) than (.*)', sentence)
+    if match:
+        return generate_more_expression(match, '>')
+
+    match = re.match(r'There are less (.*) than (.*)', sentence)
+    if match:
+        return generate_more_expression(match, '<')
+
+    match = re.match(r'There are many (.*)', sentence)
+    if match:
+        return generate_ambiguous_quantifier_expression(match, '>=', ambiguous_quantifiers['many'])
+
+    match = re.match(r'There are few (.*)', sentence)
+    if match:
+        return generate_ambiguous_quantifier_expression(match, '>=', ambiguous_quantifiers['few'])
 
     match = re.match(r'There are ([a-zA-Z0-9]*) (.*)', sentence)
     if match:
