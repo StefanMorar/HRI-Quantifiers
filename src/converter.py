@@ -94,6 +94,19 @@ def generate_as_many_than_expression(match):
                                       generate_exists_expression(noun_phrase2, [], 1))
 
 
+def generate_times_more_than_expression(match):
+    quantifier = nltk.pos_tag(nltk.word_tokenize(match.group(1)))
+    noun_phrase1 = nltk.pos_tag(nltk.word_tokenize(match.group(2)))
+    noun_phrase2 = nltk.pos_tag(nltk.word_tokenize(match.group(3)))
+    if (not validate_quantifier(quantifier)) | (not validate_noun_phrase(noun_phrase1)) | (
+            not validate_noun_phrase(noun_phrase2)):
+        return None
+
+    return '|{}| == {} * |{}|'.format(generate_exists_expression(noun_phrase1, [], 1),
+                                      get_numeric_digits(quantifier[0][0]),
+                                      generate_exists_expression(noun_phrase2, [], 1))
+
+
 def generate_most_expression(match):
     noun_phrase1 = nltk.pos_tag(nltk.word_tokenize(match.group(1)))
     noun_phrase2 = nltk.pos_tag(nltk.word_tokenize(match.group(2)))
@@ -110,6 +123,13 @@ def generate_numeric_expression(match, operator):
         return None
     return '|{}| {} {}'.format(generate_exists_expression(noun_phrase, [], 1), operator,
                                get_numeric_digits(quantifier[0][0]))
+
+
+def generate_query_expression(match):
+    noun_phrase = nltk.pos_tag(nltk.word_tokenize(match.group(1)))
+    if not validate_noun_phrase(noun_phrase):
+        return None
+    return '|{}|'.format(generate_exists_expression(noun_phrase, [], 1))
 
 
 def generate_ambiguous_quantifier_expression(match, operator, quantifier):
@@ -132,6 +152,10 @@ def generate_expression(sentence):
     match = re.match(r'There are (.*) as many (.*) than (.*)', sentence)
     if match:
         return generate_as_many_than_expression(match)
+
+    match = re.match(r'There are ([a-zA-Z0-9]*) times more (.*) than (.*)', sentence)
+    if match:
+        return generate_times_more_than_expression(match)
 
     match = re.match(r'Most (.*) are (.*)', sentence)
     if match:
@@ -176,5 +200,9 @@ def generate_expression(sentence):
     match = re.match(r'There are ([a-zA-Z0-9]*) (.*)', sentence)
     if match:
         return generate_numeric_expression(match, '>=')
+
+    match = re.match(r'How many (.*) are there?', sentence)
+    if match:
+        return generate_query_expression(match)
 
     return None

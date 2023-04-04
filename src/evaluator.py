@@ -19,7 +19,11 @@ def prepare_expression_file(expression):
 def get_no_models():
     with open(output_file_name, 'r') as file:
         contents = file.read()
-        models = json.loads(contents)
+        try:
+            models = json.loads(contents)
+        except ValueError:
+            file.close()
+            return -1
         no_models = len(models)
     file.close()
     return no_models
@@ -45,6 +49,8 @@ def evaluate_fol_cardinality_expression(expression):
 
     for fol_expression in fol_expressions:
         nr_models = evaluate_fol_expression(fol_expression)
+        if nr_models == -1:
+            return -1
         expression = re.sub(r'\|{}\|'.format(re.escape(fol_expression)), str(nr_models), expression)
 
     try:
