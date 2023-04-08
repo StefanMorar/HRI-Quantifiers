@@ -13,7 +13,7 @@ isofilter_command = ['isofilter']
 interpformat_portable_command = ['interpformat', 'portable']
 
 # run the shell commands and pipe the output
-mace4_process = subprocess.Popen(mace4_command, stdout=subprocess.PIPE)
+mace4_process = subprocess.Popen(mace4_command, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
 interpformat_process = subprocess.Popen(interpformat_command, stdin=mace4_process.stdout, stdout=subprocess.PIPE)
 isofilter_process = subprocess.Popen(isofilter_command, stdin=interpformat_process.stdout, stdout=subprocess.PIPE)
 interpformat_portable_process = subprocess.Popen(interpformat_portable_command, stdin=isofilter_process.stdout,
