@@ -59,7 +59,7 @@ def generate_exists_expression(positive_predicate_tagged_tokens, negative_predic
 
 
 def validate_noun_phrase(tagged_tokens):
-    noun_phrase_pattern = r'^(\<JJ\>)?\<NNS\>$'
+    noun_phrase_pattern = r'^(\<JJ\>)?\<(NNS|NN)\>$'
     return True if re.match(noun_phrase_pattern, get_tag_string(tagged_tokens)) else False
 
 
@@ -148,6 +148,23 @@ def generate_more_expression(match, operator):
                                  generate_exists_expression(noun_phrase2, [], 1))
 
 
+def generate_negated_exists_expression(match):
+    noun_phrase1 = nltk.pos_tag(nltk.word_tokenize(match.group(1)))
+    noun_phrase2 = nltk.pos_tag(nltk.word_tokenize(match.group(2)))
+    if (not validate_noun_phrase(noun_phrase1)) | (not validate_noun_phrase(noun_phrase2)):
+        return None
+
+    return '|-({}).| > 0'.format(generate_exists_expression(noun_phrase1 + noun_phrase2, [], 1)[:-1])
+
+
+def generate_simple_negated_exists_expression(match):
+    noun_phrase = nltk.pos_tag(nltk.word_tokenize(match.group(1)))
+    if not validate_noun_phrase(noun_phrase):
+        return None
+
+    return '|-({}).| > 0'.format(generate_exists_expression(noun_phrase, [], 1)[:-1])
+
+
 def generate_expression(sentence):
     match = re.match(r'There are (.*) as many (.*) than (.*)', sentence)
     if match:
@@ -197,12 +214,25 @@ def generate_expression(sentence):
     if match:
         return generate_ambiguous_quantifier_expression(match, '>=', ambiguous_quantifiers['few'])
 
+    match = re.match(r'There are no (.*)', sentence)
+    if match:
+        return generate_simple_negated_exists_expression(match)
+
     match = re.match(r'There are ([a-zA-Z0-9]*) (.*)', sentence)
     if match:
         return generate_numeric_expression(match, '>=')
 
-    match = re.match(r'How many (.*) are there?', sentence)
+    match = re.match(r'How many (.*) are there\?', sentence)
     if match:
         return generate_query_expression(match)
 
+    match = re.match(r'No (.*) is a (.*)', sentence)
+    if match:
+        return generate_negated_exists_expression(match)
+
     return None
+
+# print(generate_expression('How many boxes are there?'))
+# print(generate_expression('No object is a box'))
+# print(generate_expression('No object is a robot'))
+# print(generate_expression('There are no boxes'))
