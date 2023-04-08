@@ -2,14 +2,14 @@ import json
 import os
 import re
 
-sensors_file_name = '../mace4/sensors.in'
-background_knowledge_file_name = '../mace4/background_knowledge.in'
-expression_file_name = '../mace4/expression.in'
-output_file_name = '../mace4/result.out'
+mace4_directory_path = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'mace4')
+script_file_path = os.path.join(mace4_directory_path, 'mace4.py')
+expression_file_path = os.path.join(mace4_directory_path, 'expression.in')
+output_file_path = os.path.join(mace4_directory_path, 'result.out')
 
 
 def prepare_expression_file(expression):
-    with open(expression_file_name, 'w') as file:
+    with open(expression_file_path, 'w') as file:
         file.write('formulas(commands).\n')
         file.write('\t{}\n'.format(expression))
         file.write('end_of_list.')
@@ -17,7 +17,7 @@ def prepare_expression_file(expression):
 
 
 def get_no_models():
-    with open(output_file_name, 'r') as file:
+    with open(output_file_path, 'r') as file:
         contents = file.read()
         try:
             models = json.loads(contents)
@@ -32,14 +32,11 @@ def get_no_models():
 def evaluate_fol_expression(expression):
     prepare_expression_file(expression)
 
-    os.system(
-        'mace4 -f {} {} {} | interpformat standard | isofilter | interpformat portable > {}'.format(sensors_file_name,
-                                                                                                    background_knowledge_file_name,
-                                                                                                    expression_file_name,
-                                                                                                    output_file_name))
+    os.system('python ' + script_file_path)
+
     no_models = get_no_models()
 
-    os.system('rm {}'.format(output_file_name))
+    os.system('rm {}'.format(output_file_path))
 
     return no_models
 
