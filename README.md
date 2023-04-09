@@ -13,7 +13,7 @@
 
 ## Execution
 
-- In root folder of the repository, run `python main.py`. The command will read the contents of [queries.in](input/queries.in) and [commands.in](input/commands.in) and write the output to [queries.out](output/queries.out) and [commands.out](output/commands.out).
+- In the root folder of the repository, run `python main.py`. The command will read the contents of [queries.in](input/queries.in) and [commands.in](input/commands.in) and write the output to [queries.out](output/queries.out) and [commands.out](output/commands.out).
 
 ### Queries
 
