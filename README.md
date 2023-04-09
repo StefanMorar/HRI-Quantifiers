@@ -2,9 +2,24 @@
 
 ## Installation
 
+- Python 3.10
+- Mace4: [Prover9 (and Mace4) Download](https://www.cs.unm.edu/~mccune/prover9/download/)
+   - Add the `bin` directory to PATH: 
+      - Open the `~/.bashrc` file, add the following line at the end of it: `export PATH="[...]:$PATH"`, where `[..]` should be replaced with the absolute path of the `bin` folder (e.g., `export PATH="/home/user/LADR-2009-11A/bin:$PATH"`) 
+      - Save the file and load the new `$PATH` executing `source ~/.bashrc`
 - NLTK: [Installing NLTK](https://www.nltk.org/install.html)
 - inflect: `pip install inflect`
 - word2number: `pip install word2number`
+
+## Execution
+
+- In root folder of the repository, run `python main.py`. The command will read the contents of [queries.in](input/queries.in) and [commands.in](input/commands.in) and write the output to [queries.out](output/queries.out) and [commands.out](output/commands.out).
+
+### Queries
+
+### Commands
+
+_To be implemented_
 
 ## Examples
 
