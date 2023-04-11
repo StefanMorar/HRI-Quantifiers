@@ -232,7 +232,13 @@ def generate_expression(sentence):
 
     return None
 
-# print(generate_expression('How many boxes are there?'))
-# print(generate_expression('No object is a box'))
-# print(generate_expression('No object is a robot'))
-# print(generate_expression('There are no boxes'))
+
+def main():
+    print(generate_expression('How many boxes are there?'))
+    print(generate_expression('No object is a box'))
+    print(generate_expression('No object is a robot'))
+    print(generate_expression('There are no boxes'))
+
+
+if __name__ == "__main__":
+    main()

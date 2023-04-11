@@ -3,7 +3,7 @@ import os
 import re
 
 mace4_directory_path = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'mace4')
-script_file_path = os.path.join(mace4_directory_path, 'mace4.py')
+script_file_path = os.path.join(mace4_directory_path, 'run-mace4.py')
 expression_file_path = os.path.join(mace4_directory_path, 'expression.in')
 output_file_path = os.path.join(mace4_directory_path, 'result.out')
 
@@ -55,4 +55,10 @@ def evaluate_fol_cardinality_expression(expression):
     except SyntaxError:
         return -1
 
-# print(evaluate_fol_cardinality_expression('|exists x (box(x)).| == 2 * |exists x (tool(x)).|'))
+
+def main():
+    print(evaluate_fol_cardinality_expression('|exists x (box(x)).| == 2 * |exists x (tool(x)).|'))
+
+
+if __name__ == "__main__":
+    main()

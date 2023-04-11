@@ -18,4 +18,4 @@ with open(queries_input_file_path, 'r') as input_file, open(queries_output_file_
         data = {'expression': expression, 'evaluation': evaluation}
         output_file.write(json.dumps(data) + '\n')
         count += 1
-print('Processed {} queries. Output saved in output/queries.out'.format(count))
+print('Processed {} queries. Output saved to output/queries.out'.format(count))

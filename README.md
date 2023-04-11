@@ -19,6 +19,11 @@ In the root folder of the repository, run `python main.py`. The command will rea
 of [queries.in](input/queries.in) and [commands.in](input/commands.in) and write the output
 to [queries.out](output/queries.out) and [commands.out](output/commands.out).
 
+Alternatively, each component can be executed independently:
+- `python mace4/run-mace4.py`: will evaluate the expression from [expression.in](mace4/expression.in) against [background-knowledge.in](mace4/background-knowledge.in) and [sensors.in](mace4/sensors.in) and write the models to `result.out`
+- `python src/evaluator.py`: will evaluate the expressions from the `main()` function. Update the contents of this function to test different expressions
+- `python src/converter.py`: will convert the sentences from the `main()` function to FOL with cardinality. Update the contents of this function to test certain conversions
+
 ### Queries
 
 For each line in [queries.in](input/queries.in) that contains a query in natural language, a JSON object is generated
