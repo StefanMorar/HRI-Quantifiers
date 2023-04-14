@@ -27,6 +27,12 @@ def get_tag_string(tagged_tokens):
     return ''.join('<{}>'.format(tagged_token[1]) for tagged_token in tagged_tokens)
 
 
+def get_inner_expression(sign_predicates, variable_number):
+    return ' & '.join(
+        [('' if sign_predicate[1] == '+' else '-') + '{}(x{})'.format(sign_predicate[0], variable_number) for
+         sign_predicate in sign_predicates])
+
+
 def generate_exists_expression(positive_predicate_tagged_tokens, negative_predicate_tagged_tokens, no_variables):
     signs = ['+'] * len(positive_predicate_tagged_tokens) + ['-'] * len(negative_predicate_tagged_tokens)
     predicates = [get_predicate(t) for t in positive_predicate_tagged_tokens + negative_predicate_tagged_tokens]
@@ -38,9 +44,7 @@ def generate_exists_expression(positive_predicate_tagged_tokens, negative_predic
     else:
         inner_expression = ''
         for iterator in range(no_variables):
-            partial_inner_expression = ' & '.join(
-                [('' if sign_predicate[1] == '+' else '-') + '{}(x{})'.format(sign_predicate[0], iterator) for
-                 sign_predicate in sign_predicates])
+            partial_inner_expression = get_inner_expression(sign_predicates, iterator)
             if iterator == 0:
                 inner_expression = partial_inner_expression
             else:
@@ -56,6 +60,18 @@ def generate_exists_expression(positive_predicate_tagged_tokens, negative_predic
 
         outer_expression = 'exists ' + ' exists '.join(variables)
         return '{} ({}).'.format(outer_expression, inner_expression)
+
+
+def generate_all_expression(premise_predicate_tagged_tokens, conclusion_predicate_tagged_tokens,
+                            conclusion_predicate_sign):
+    premise_predicates = [get_predicate(t) for t in premise_predicate_tagged_tokens]
+    conclusion_predicates = [get_predicate(t) for t in conclusion_predicate_tagged_tokens]
+    sign_premise_predicates = list(zip(premise_predicates, ['+'] * len(premise_predicates)))
+    sign_conclusion_predicates = list(zip(conclusion_predicates,
+                                          [conclusion_predicate_sign] * len(conclusion_predicates)))
+    premise_inner_expression = get_inner_expression(sign_premise_predicates, 0)
+    conclusion_inner_expression = get_inner_expression(sign_conclusion_predicates, 0)
+    return 'all x0 ({} -> {}).'.format(premise_inner_expression, conclusion_inner_expression)
 
 
 def validate_noun_phrase(tagged_tokens):
@@ -112,6 +128,7 @@ def generate_most_expression(match):
     noun_phrase2 = nltk.pos_tag(nltk.word_tokenize(match.group(2)))
     if (not validate_noun_phrase(noun_phrase1)) | (not validate_noun_phrase(noun_phrase2)):
         return None
+
     return '|{}| > |{}|'.format(generate_exists_expression(noun_phrase1 + noun_phrase2, [], 1),
                                 generate_exists_expression(noun_phrase1, noun_phrase2, 1))
 
@@ -121,6 +138,7 @@ def generate_numeric_expression(match, operator):
     noun_phrase = nltk.pos_tag(nltk.word_tokenize(match.group(2)))
     if (not validate_quantifier(quantifier)) | (not validate_noun_phrase(noun_phrase)):
         return None
+
     return '|{}| {} {}'.format(generate_exists_expression(noun_phrase, [], 1), operator,
                                get_numeric_digits(quantifier[0][0]))
 
@@ -129,6 +147,7 @@ def generate_query_expression(match):
     noun_phrase = nltk.pos_tag(nltk.word_tokenize(match.group(1)))
     if not validate_noun_phrase(noun_phrase):
         return None
+
     return '|{}|'.format(generate_exists_expression(noun_phrase, [], 1))
 
 
@@ -136,6 +155,7 @@ def generate_ambiguous_quantifier_expression(match, operator, quantifier):
     noun_phrase = nltk.pos_tag(nltk.word_tokenize(match.group(1)))
     if not validate_noun_phrase(noun_phrase):
         return None
+
     return '|{}| {} {}'.format(generate_exists_expression(noun_phrase, [], 1), operator, quantifier)
 
 
@@ -144,6 +164,7 @@ def generate_more_expression(match, operator):
     noun_phrase2 = nltk.pos_tag(nltk.word_tokenize(match.group(2)))
     if (not validate_noun_phrase(noun_phrase1)) | (not validate_noun_phrase(noun_phrase2)):
         return None
+
     return '|{}| {} |{}|'.format(generate_exists_expression(noun_phrase1, [], 1), operator,
                                  generate_exists_expression(noun_phrase2, [], 1))
 
@@ -163,6 +184,15 @@ def generate_simple_negated_exists_expression(match):
         return None
 
     return '|-({}).| > 0'.format(generate_exists_expression(noun_phrase, [], 1)[:-1])
+
+
+def generate_all_every_expression(match):
+    noun_phrase1 = nltk.pos_tag(nltk.word_tokenize(match.group(1)))
+    noun_phrase2 = nltk.pos_tag(nltk.word_tokenize(match.group(2)))
+    if (not validate_noun_phrase(noun_phrase1)) | (not validate_noun_phrase(noun_phrase2)):
+        return None
+
+    return generate_all_expression(noun_phrase1, noun_phrase2, '+')
 
 
 def generate_expression(sentence):
@@ -230,14 +260,20 @@ def generate_expression(sentence):
     if match:
         return generate_negated_exists_expression(match)
 
+    match = re.match(r'All (.*) are (.*)', sentence)
+    if match:
+        return generate_all_every_expression(match)
+
+    match = re.match(r'Every (.*) is(?: an? )?(.*)', sentence)
+    if match:
+        return generate_all_every_expression(match)
+
     return None
 
 
 def main():
-    print(generate_expression('How many boxes are there?'))
-    print(generate_expression('No object is a box'))
-    print(generate_expression('No object is a robot'))
-    print(generate_expression('There are no boxes'))
+    print(generate_expression('All boxes are objects'))
+    print(generate_expression('Every object is a box'))
 
 
 if __name__ == "__main__":
