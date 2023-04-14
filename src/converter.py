@@ -71,7 +71,7 @@ def generate_all_expression(premise_predicate_tagged_tokens, conclusion_predicat
                                           [conclusion_predicate_sign] * len(conclusion_predicates)))
     premise_inner_expression = get_inner_expression(sign_premise_predicates, 0)
     conclusion_inner_expression = get_inner_expression(sign_conclusion_predicates, 0)
-    return 'all x0 ({} -> {}).'.format(premise_inner_expression, conclusion_inner_expression)
+    return '|all x0 ({} -> {}).|'.format(premise_inner_expression, conclusion_inner_expression)
 
 
 def validate_noun_phrase(tagged_tokens):

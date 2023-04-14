@@ -58,6 +58,7 @@ def evaluate_fol_cardinality_expression(expression):
 
 def main():
     print(evaluate_fol_cardinality_expression('|exists x (box(x)).| == 2 * |exists x (tool(x)).|'))
+    print(evaluate_fol_cardinality_expression('|all x0 (box(x0) -> object(x0)).|'))
 
 
 if __name__ == "__main__":
