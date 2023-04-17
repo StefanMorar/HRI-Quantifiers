@@ -42,7 +42,13 @@ def evaluate_fol_expression(expression):
 
 
 def evaluate_fol_cardinality_expression(expression):
+    if expression is None:
+        return None
+
     fol_expressions = re.findall(r'\|([^|]+)\|', expression)
+
+    if len(fol_expressions) == 0:
+        return evaluate_fol_expression(expression)
 
     for fol_expression in fol_expressions:
         nr_models = evaluate_fol_expression(fol_expression)
@@ -58,7 +64,7 @@ def evaluate_fol_cardinality_expression(expression):
 
 def main():
     print(evaluate_fol_cardinality_expression('|exists x (box(x)).| == 2 * |exists x (tool(x)).|'))
-    print(evaluate_fol_cardinality_expression('|all x0 (box(x0) -> object(x0)).|'))
+    print(evaluate_fol_cardinality_expression('all x0 (box(x0) -> object(x0)).'))
 
 
 if __name__ == "__main__":

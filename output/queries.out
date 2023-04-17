@@ -14,5 +14,7 @@
 {"expression": "|-(exists x0 (object(x0) & box(x0))).| > 0", "evaluation": -1}
 {"expression": "|-(exists x0 (object(x0) & robot(x0))).| > 0", "evaluation": true}
 {"expression": "|-(exists x0 (box(x0))).| > 0", "evaluation": -1}
-{"expression": "|all x0 (box(x0) -> object(x0)).|", "evaluation": 1}
-{"expression": "|all x0 (object(x0) -> box(x0)).|", "evaluation": -1}
+{"expression": "all x0 (box(x0) -> object(x0)).", "evaluation": 1}
+{"expression": "all x0 (object(x0) -> box(x0)).", "evaluation": -1}
+{"expression": "all x0 (box(x0) -> -object(x0)).", "evaluation": -1}
+{"expression": "all x0 (object(x0) -> -box(x0)).", "evaluation": -1}
