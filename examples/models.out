@@ -1,0 +1,262 @@
+[
+  [8,
+    [ "=(number,1)",  "=(seconds,0)" ],
+    [
+      ["function", "B1", 0,
+         1
+      ],
+      ["function", "B2", 0,
+         2
+      ],
+      ["function", "B3", 0,
+         3
+      ],
+      ["function", "B4", 0,
+         4
+      ],
+      ["function", "L1", 0,
+         7
+      ],
+      ["function", "R1", 0,
+         0
+      ],
+      ["function", "T1", 0,
+         5
+      ],
+      ["function", "T2", 0,
+         6
+      ],
+      ["function", "c1", 0,
+         1
+      ],
+      ["relation", "blue", 1,
+        [ 0, 0, 1, 0, 0, 0, 0, 0]
+      ],
+      ["relation", "box", 1,
+        [ 0, 1, 1, 1, 1, 0, 0, 0]
+      ],
+      ["relation", "brown", 1,
+        [ 0, 0, 0, 0, 0, 0, 0, 1]
+      ],
+      ["relation", "color", 1,
+        [ 0, 1, 1, 1, 1, 1, 1, 1]
+      ],
+      ["relation", "grey", 1,
+        [ 0, 0, 0, 0, 0, 1, 1, 0]
+      ],
+      ["relation", "object", 1,
+        [ 0, 1, 1, 1, 1, 1, 1, 0]
+      ],
+      ["relation", "red", 1,
+        [ 0, 1, 0, 1, 0, 0, 0, 0]
+      ],
+      ["relation", "robot", 1,
+        [ 1, 0, 0, 0, 0, 0, 0, 0]
+      ],
+      ["relation", "table", 1,
+        [ 0, 0, 0, 0, 0, 0, 0, 1]
+      ],
+      ["relation", "tool", 1,
+        [ 0, 0, 0, 0, 0, 1, 1, 0]
+      ],
+      ["relation", "yellow", 1,
+        [ 0, 0, 0, 0, 1, 0, 0, 0]
+      ]
+    ]
+  ],
+  [8,
+    [ "=(number,2)",  "=(seconds,0)" ],
+    [
+      ["function", "B1", 0,
+         1
+      ],
+      ["function", "B2", 0,
+         2
+      ],
+      ["function", "B3", 0,
+         3
+      ],
+      ["function", "B4", 0,
+         4
+      ],
+      ["function", "L1", 0,
+         7
+      ],
+      ["function", "R1", 0,
+         0
+      ],
+      ["function", "T1", 0,
+         5
+      ],
+      ["function", "T2", 0,
+         6
+      ],
+      ["function", "c1", 0,
+         2
+      ],
+      ["relation", "blue", 1,
+        [ 0, 0, 1, 0, 0, 0, 0, 0]
+      ],
+      ["relation", "box", 1,
+        [ 0, 1, 1, 1, 1, 0, 0, 0]
+      ],
+      ["relation", "brown", 1,
+        [ 0, 0, 0, 0, 0, 0, 0, 1]
+      ],
+      ["relation", "color", 1,
+        [ 0, 1, 1, 1, 1, 1, 1, 1]
+      ],
+      ["relation", "grey", 1,
+        [ 0, 0, 0, 0, 0, 1, 1, 0]
+      ],
+      ["relation", "object", 1,
+        [ 0, 1, 1, 1, 1, 1, 1, 0]
+      ],
+      ["relation", "red", 1,
+        [ 0, 1, 0, 1, 0, 0, 0, 0]
+      ],
+      ["relation", "robot", 1,
+        [ 1, 0, 0, 0, 0, 0, 0, 0]
+      ],
+      ["relation", "table", 1,
+        [ 0, 0, 0, 0, 0, 0, 0, 1]
+      ],
+      ["relation", "tool", 1,
+        [ 0, 0, 0, 0, 0, 1, 1, 0]
+      ],
+      ["relation", "yellow", 1,
+        [ 0, 0, 0, 0, 1, 0, 0, 0]
+      ]
+    ]
+  ],
+  [8,
+    [ "=(number,3)",  "=(seconds,0)" ],
+    [
+      ["function", "B1", 0,
+         1
+      ],
+      ["function", "B2", 0,
+         2
+      ],
+      ["function", "B3", 0,
+         3
+      ],
+      ["function", "B4", 0,
+         4
+      ],
+      ["function", "L1", 0,
+         7
+      ],
+      ["function", "R1", 0,
+         0
+      ],
+      ["function", "T1", 0,
+         5
+      ],
+      ["function", "T2", 0,
+         6
+      ],
+      ["function", "c1", 0,
+         3
+      ],
+      ["relation", "blue", 1,
+        [ 0, 0, 1, 0, 0, 0, 0, 0]
+      ],
+      ["relation", "box", 1,
+        [ 0, 1, 1, 1, 1, 0, 0, 0]
+      ],
+      ["relation", "brown", 1,
+        [ 0, 0, 0, 0, 0, 0, 0, 1]
+      ],
+      ["relation", "color", 1,
+        [ 0, 1, 1, 1, 1, 1, 1, 1]
+      ],
+      ["relation", "grey", 1,
+        [ 0, 0, 0, 0, 0, 1, 1, 0]
+      ],
+      ["relation", "object", 1,
+        [ 0, 1, 1, 1, 1, 1, 1, 0]
+      ],
+      ["relation", "red", 1,
+        [ 0, 1, 0, 1, 0, 0, 0, 0]
+      ],
+      ["relation", "robot", 1,
+        [ 1, 0, 0, 0, 0, 0, 0, 0]
+      ],
+      ["relation", "table", 1,
+        [ 0, 0, 0, 0, 0, 0, 0, 1]
+      ],
+      ["relation", "tool", 1,
+        [ 0, 0, 0, 0, 0, 1, 1, 0]
+      ],
+      ["relation", "yellow", 1,
+        [ 0, 0, 0, 0, 1, 0, 0, 0]
+      ]
+    ]
+  ],
+  [8,
+    [ "=(number,4)",  "=(seconds,0)" ],
+    [
+      ["function", "B1", 0,
+         1
+      ],
+      ["function", "B2", 0,
+         2
+      ],
+      ["function", "B3", 0,
+         3
+      ],
+      ["function", "B4", 0,
+         4
+      ],
+      ["function", "L1", 0,
+         7
+      ],
+      ["function", "R1", 0,
+         0
+      ],
+      ["function", "T1", 0,
+         5
+      ],
+      ["function", "T2", 0,
+         6
+      ],
+      ["function", "c1", 0,
+         4
+      ],
+      ["relation", "blue", 1,
+        [ 0, 0, 1, 0, 0, 0, 0, 0]
+      ],
+      ["relation", "box", 1,
+        [ 0, 1, 1, 1, 1, 0, 0, 0]
+      ],
+      ["relation", "brown", 1,
+        [ 0, 0, 0, 0, 0, 0, 0, 1]
+      ],
+      ["relation", "color", 1,
+        [ 0, 1, 1, 1, 1, 1, 1, 1]
+      ],
+      ["relation", "grey", 1,
+        [ 0, 0, 0, 0, 0, 1, 1, 0]
+      ],
+      ["relation", "object", 1,
+        [ 0, 1, 1, 1, 1, 1, 1, 0]
+      ],
+      ["relation", "red", 1,
+        [ 0, 1, 0, 1, 0, 0, 0, 0]
+      ],
+      ["relation", "robot", 1,
+        [ 1, 0, 0, 0, 0, 0, 0, 0]
+      ],
+      ["relation", "table", 1,
+        [ 0, 0, 0, 0, 0, 0, 0, 1]
+      ],
+      ["relation", "tool", 1,
+        [ 0, 0, 0, 0, 0, 1, 1, 0]
+      ],
+      ["relation", "yellow", 1,
+        [ 0, 0, 0, 0, 1, 0, 0, 0]
+      ]
+    ]
+  ]
+]
