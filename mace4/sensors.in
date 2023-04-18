@@ -1,10 +1,12 @@
-assign(domain_size, 4).
+assign(domain_size, 8).
 assign(max_models, -1).
 set(arithmetic).
 
 formulas(sensors).
-  R1 = 0. B1 = 1. B2 = 2. T1 = 3.
+  R1 = 0. B1 = 1. B2 = 2. B3 = 3. B4 = 4. T1 = 5. T2 = 6. L1 = 7.
   robot(R1).
-  box(B1). box(B2).
-  tool(T1).
+  box(B1). box(B2). box(B3). box(B4).
+  tool(T1). tool(T2).
+  table(L1).
+  red(B1). red(B3). blue(B2). yellow(B4). grey(T1). grey(T2). brown(L1).
 end_of_list.

@@ -1,8 +1,16 @@
-% mace4 -f sensors.in background_knowledge.in expression.in
-
 formulas(background_knowledge).
   robot(x) -> -object(x).
   box(x) -> object(x).
   tool(x) -> object(x).
   box(x) -> -tool(x).
+  table(x) -> -object(x).
+  table(x) -> -robot(x).
+
+  robot(x) -> -color(x).
+  red(x) | blue(x) | yellow(x) | grey(x) | brown(x) -> color(x).
+  red(x) | blue(x) | yellow(x) | grey(x) -> -brown(x).
+  red(x) | blue(x) | yellow(x) | brown(x) -> -grey(x).
+  red(x) | blue(x) | grey(x) | brown(x) -> -yellow(x).
+  red(x) | yellow(x) | grey(x) | brown(x) -> -blue(x).
+  blue(x) | yellow(x) | grey(x) |  brown(x) -> -red(x).
 end_of_list.
