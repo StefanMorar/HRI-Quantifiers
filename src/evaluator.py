@@ -14,7 +14,6 @@ def prepare_expression_file(expression):
         file.write('formulas(commands).\n')
         file.write('\t{}\n'.format(expression))
         file.write('end_of_list.')
-    file.close()
 
 
 def get_no_models():
@@ -23,10 +22,8 @@ def get_no_models():
         try:
             models = json.loads(contents)
         except ValueError:
-            file.close()
             return -1
         no_models = len(models)
-    file.close()
     return no_models
 
 
