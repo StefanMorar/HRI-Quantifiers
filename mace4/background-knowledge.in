@@ -13,4 +13,10 @@ formulas(background_knowledge).
   red(x) | blue(x) | grey(x) | brown(x) -> -yellow(x).
   red(x) | yellow(x) | grey(x) | brown(x) -> -blue(x).
   blue(x) | yellow(x) | grey(x) |  brown(x) -> -red(x).
+
+  % commands
+  robot(x) & object(y) -> move(x, y).
+  -robot(x) & object(y) -> -move(x, y).
+  -object(x) -> -move(y, x).
+  -move(x, x).
 end_of_list.
