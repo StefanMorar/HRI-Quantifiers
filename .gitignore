@@ -1,2 +1,4 @@
 venv
 .idea
+*.tar.gz
+LADR-2009-11A

@@ -30,7 +30,7 @@ def get_no_models():
 def evaluate_fol_expression(expression):
     prepare_expression_file(expression)
 
-    os.system('python ' + script_file_path)
+    os.system('python3 ' + script_file_path)
 
     no_models = get_no_models()
 
