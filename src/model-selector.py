@@ -2,8 +2,8 @@ import json
 import os
 import re
 
-mace4_directory_path = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'examples')
-output_file_path = os.path.join(mace4_directory_path, 'models.out')
+mace4_directory_path = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'mace4')
+output_file_path = os.path.join(mace4_directory_path, 'result.out')
 
 
 def read_models():
@@ -75,7 +75,7 @@ def process_models():
         variables = get_variables(model[2])
         variable_dictionaries.append(variables)
     print(get_processed_variables(variable_dictionaries))
-    print(get_predicates_by_constant(predicates, 1))
+    print(get_predicates_by_constant(predicates, 4))
 
 
 process_models()

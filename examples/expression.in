@@ -1,3 +1,3 @@
 formulas(commands).
-	exists x (food(x)).
+	exists x (box(x)).
 end_of_list.

@@ -5,6 +5,7 @@ import re
 mace4_directory_path = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'mace4')
 script_file_path = os.path.join(mace4_directory_path, 'run-mace4.py')
 expression_file_path = os.path.join(mace4_directory_path, 'expression.in')
+sensors_file_path = os.path.join(mace4_directory_path, 'sensors.in')
 background_knowledge_file_path = os.path.join(mace4_directory_path, 'background-knowledge.in')
 output_file_path = os.path.join(mace4_directory_path, 'result.out')
 
@@ -12,8 +13,23 @@ output_file_path = os.path.join(mace4_directory_path, 'result.out')
 def prepare_expression_file(expression):
     with open(expression_file_path, 'w') as file:
         file.write('formulas(commands).\n')
-        file.write('\t{}\n'.format(expression))
+        file.write(f'\t{expression}\n')
         file.write('end_of_list.')
+
+
+def prepare_sensors_file(predicates):
+    with open(sensors_file_path, 'w') as file:
+        file.write(f'assign(domain_size, {len(predicates)}).\n\n')
+        file.write('formulas(sensors).\n')
+        for item in predicates:
+            predicate = item[0][0].lower() + item[0][1:]
+            variable = item[1][0].upper() + item[1][1:]
+            file.write(f'\t{predicate}({variable}).\n')
+        file.write('\t')
+        for i, item in enumerate(predicates):
+            variable = item[1][0].upper() + item[1][1:]
+            file.write(f'{variable} = {i}. ')
+        file.write('\nend_of_list.')
 
 
 def get_no_models():
@@ -33,8 +49,6 @@ def evaluate_fol_expression(expression):
     os.system('python3 ' + script_file_path)
 
     no_models = get_no_models()
-
-    os.system('rm {}'.format(output_file_path))
 
     return no_models
 
