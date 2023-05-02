@@ -3,7 +3,7 @@ import subprocess
 
 mace4_directory_path = os.path.dirname(os.path.realpath(__file__))
 sensors_file_path = os.path.join(mace4_directory_path, 'sensors.in')
-background_knowledge_file_path = os.path.join(mace4_directory_path, 'background-knowledge.in')
+background_knowledge_file_path = os.path.join(mace4_directory_path, 'background_knowledge.in')
 expression_file_path = os.path.join(mace4_directory_path, 'expression.in')
 output_file_path = os.path.join(mace4_directory_path, 'result.out')
 

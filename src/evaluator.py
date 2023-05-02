@@ -1,12 +1,14 @@
-import json
 import os
 import re
 
+from model_selector import get_no_models
+from utils import to_lowercase_first_character_string, to_uppercase_first_character_string
+
 mace4_directory_path = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'mace4')
-script_file_path = os.path.join(mace4_directory_path, 'run-mace4.py')
+script_file_path = os.path.join(mace4_directory_path, 'run_mace4.py')
 expression_file_path = os.path.join(mace4_directory_path, 'expression.in')
 sensors_file_path = os.path.join(mace4_directory_path, 'sensors.in')
-background_knowledge_file_path = os.path.join(mace4_directory_path, 'background-knowledge.in')
+background_knowledge_file_path = os.path.join(mace4_directory_path, 'background_knowledge.in')
 output_file_path = os.path.join(mace4_directory_path, 'result.out')
 
 
@@ -22,25 +24,14 @@ def prepare_sensors_file(predicates):
         file.write(f'assign(domain_size, {len(predicates)}).\n\n')
         file.write('formulas(sensors).\n')
         for item in predicates:
-            predicate = item[0][0].lower() + item[0][1:]
-            variable = item[1][0].upper() + item[1][1:]
+            predicate = to_lowercase_first_character_string(item[0])
+            variable = to_uppercase_first_character_string(item[1])
             file.write(f'\t{predicate}({variable}).\n')
         file.write('\t')
         for i, item in enumerate(predicates):
-            variable = item[1][0].upper() + item[1][1:]
+            variable = to_uppercase_first_character_string(item[1])
             file.write(f'{variable} = {i}. ')
         file.write('\nend_of_list.')
-
-
-def get_no_models():
-    with open(output_file_path, 'r') as file:
-        contents = file.read()
-        try:
-            models = json.loads(contents)
-        except ValueError:
-            return -1
-        no_models = len(models)
-    return no_models
 
 
 def evaluate_fol_expression(expression):
@@ -85,7 +76,7 @@ def preprocess_predicates(expression):
 
 def evaluate_fol_cardinality_expression(expression):
     if expression is None:
-        return None
+        return -3
 
     if not preprocess_predicates(expression):
         return -2
@@ -104,13 +95,13 @@ def evaluate_fol_cardinality_expression(expression):
     try:
         return eval(expression)
     except SyntaxError:
-        return -1
+        return -3
 
 
 def main():
-    print(evaluate_fol_cardinality_expression('|exists x (box(x)).| == 2 * |exists x (tool(x)).|'))
-    print(evaluate_fol_cardinality_expression('all x0 (box(x0) -> object(x0)).'))
-    print(evaluate_fol_cardinality_expression('|exists x0 (object(x0) & ball(x0)).|'))
+    print(evaluate_fol_cardinality_expression('|exists x (onion(x)).| == 2 * |exists x (largeBowl(x)).|'))
+    print(evaluate_fol_cardinality_expression('all x0 (food(x0) -> onion(x0)).'))
+    print(evaluate_fol_cardinality_expression('|exists x0 (food(x0) & peeledRedOnion(x0)).|'))
 
 
 if __name__ == "__main__":

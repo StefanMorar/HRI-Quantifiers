@@ -20,3 +20,9 @@ def get_kitchen_state():
     payload = {'kitchenStateIn': '?kitchen-state-1'}
     response = requests.post(f'{abe_sim_url}/to-get-kitchen', data=json.dumps(payload))
     return process_response(response)
+
+
+def fetch_kitchen_object(kitchen_object):
+    payload = {'object': kitchen_object, 'kitchenStateIn': None, 'setWorldState': False}
+    response = requests.post(f'{abe_sim_url}/to-fetch', data=json.dumps(payload))
+    return process_response(response)

@@ -36,8 +36,8 @@ to [queries.out](output/queries.out) and [commands.out](output/commands.out).
 
 Alternatively, each component can be executed independently:
 
-- `python3 mace4/run-mace4.py`: will evaluate the expression from [expression.in](mace4/expression.in)
-  against [background-knowledge.in](mace4/background-knowledge.in) and [sensors.in](mace4/sensors.in) and write the
+- `python3 mace4/run_mace4.py`: will evaluate the expression from [expression.in](mace4/expression.in)
+  against [background_knowledge.in](mace4/background_knowledge.in) and [sensors.in](mace4/sensors.in) and write the
   models to `result.out`
 - `python3 src/evaluator.py`: will evaluate the expressions from the `main()` function. Update the contents of this
   function to test different expressions

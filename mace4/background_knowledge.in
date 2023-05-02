@@ -1,0 +1,40 @@
+assign(max_models, -1).
+set(arithmetic).
+
+formulas(background_knowledge).
+kitchenUnit(x) -> kitchenware(x).
+    kitchenTool(x) -> kitchenware(x).
+    kitchenCounter(x) -> kitchenUnit(x).
+    kitchenCabinet(x) -> kitchenUnit(x).
+    cuttingBoard(x) -> kitchenTool(x).
+    bowl(x) -> kitchenTool(x).
+    cuttingTool(x) -> kitchenTool(x).
+    largeBowl(x) -> bowl(x).
+    cookingKnife(x) -> cuttingTool(x).
+    onion(x) -> food(x).
+    peeledOnion(x) -> onion(x).
+    peeledRedOnion(x) -> onion(x).
+
+    abe(x) -> -food(x).
+    abe(x) -> -kitchenware(x).
+    abe(x) -> -floor(x).
+    floor(x) -> -food(x).
+    floor(x) -> -kitchenware(x).
+    food(x) -> -kitchenware(x).
+
+    kitchenUnit(x) -> -kitchenTool(x).
+    kitchenCounter(x) -> -kitchenCabinet(x).
+    cuttingBoard(x) -> -bowl(x).
+    cuttingBoard(x) -> -cuttingTool(x).
+    bowl(x) -> -cuttingTool(x).
+    peeledOnion(x) -> -peeledRedOnion(x).
+
+    abe(x) & (food(y)) -> fetch(x, y).
+    -abe(x) -> -fetch(x, y).
+    -food(x) -> -fetch(y, x).
+
+    abe(x) & food(y) & cuttingTool(z) -> cut(x, y, z).
+    -abe(x) -> -cut(x, y, z).
+    -food(y) -> -cut(x, y, z).
+    -cuttingTool(z) -> -cut(x, y, z).
+end_of_list.
