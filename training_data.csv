@@ -39,6 +39,7 @@
 "Hi again, now cut many tomatoes using CookingKnife1","{'type':'command','expressions':[['|exists x1 (tomato(x1)).| >= 10']],'commands':['abe(x0) & tomato(x1) -> cut(x0, x1, x2).']}"
 "Next cut 1 mango using cooking knife Knife1","{'type':'command','expressions':[['|exists x1 (mango(x1)).| >= 1']],'commands':['abe(x0) & mango(x1) & cookingKnife(Knife1) -> cut(x0, x1, Knife1).']}"
 "Please cut brownOnion1 with cookingKnife1","{'type':'command','expressions':[[]],'commands':['abe(x0) -> cut(x0, BrownOnion1, CookingKnife1).']}"
+"Slice some bananas with a knife","{'type':'command','expressions':[['|exists x1 (banana(x1)).| >= 4','|exists x2 (cookingKnife(x2)).| >= 1']],'commands':['abe(x0) & banana(x1) & cookingKnife(x2) -> cut(x0, x1, x2).']}"
 "Slice brownOnion1 with cookingKnife1","{'type':'command','expressions':[[]],'commands':['abe(x0) -> cut(x0, BrownOnion1, CookingKnife1).']}"
 "Cut Onion1","{'type':'command','expressions':[[]],'commands':['abe(x0) & cuttingTool(x2) -> cut(x0, Onion1, x2).']}"
 "Cut all onions","{'type':'command','expressions':[['|exists x1 (onion(x1)).|']],'commands':['abe(x0) & onion(x1) & cuttingTool(x2) -> cut(x0, x1, x2).']}"
