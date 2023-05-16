@@ -88,8 +88,6 @@ def evaluate_fol_cardinality_expression(expression):
 
     for fol_expression in fol_expressions:
         nr_models = evaluate_fol_expression(fol_expression)
-        if nr_models == -1:
-            return -1
         expression = re.sub(r'\|{}\|'.format(re.escape(fol_expression)), str(nr_models), expression)
 
     try:

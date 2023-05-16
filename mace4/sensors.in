@@ -1,4 +1,4 @@
-assign(domain_size, 8).
+assign(domain_size, 10).
 
 formulas(sensors).
 	floor(Floor).
@@ -7,7 +7,9 @@ formulas(sensors).
 	kitchenCabinet(KitchenCabinet).
 	cuttingBoard(CuttingBoard).
 	peeledOnion(BrownOnion).
-	peeledRedOnion(RedOnion).
+	peeledRedOnion(RedOnion1).
+	peeledRedOnion(RedOnion2).
 	largeBowl(LargeBowl).
-	Floor = 0. Abe = 1. KitchenCounter = 2. KitchenCabinet = 3. CuttingBoard = 4. BrownOnion = 5. RedOnion = 6. LargeBowl = 7. 
+	cookingKnife(CookingKnife).
+	Floor = 0. Abe = 1. KitchenCounter = 2. KitchenCabinet = 3. CuttingBoard = 4. BrownOnion = 5. RedOnion1 = 6. RedOnion2 = 7. LargeBowl = 8. CookingKnife = 9. 
 end_of_list.

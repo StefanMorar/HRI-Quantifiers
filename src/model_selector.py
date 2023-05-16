@@ -19,7 +19,7 @@ def read_models():
 def get_no_models():
     models = read_models()
     if models is None:
-        return -1
+        return 0
     return len(models)
 
 
@@ -77,7 +77,14 @@ def get_variables_by_key(variable_dictionaries):
                 result_dictionary[key].append(value)
             else:
                 result_dictionary[key] = [value]
-    return [list(value) for value in result_dictionary.values()]
+    return [list(set(value)) for value in result_dictionary.values()]
+
+
+def get_variables_as_constants_by_key():
+    models = read_models()
+    variables = get_variables_by_key(get_variables(models))
+    constants = get_constants(models)
+    return [[constants[variable] for variable in single_model_variables] for single_model_variables in variables]
 
 
 def choose_models(nr_models):
@@ -99,10 +106,10 @@ def main():
     # variables = get_variables(models)
     # print(variables)
     # print(get_variables_by_model(variables))
-    # print(get_variables_by_key(variables))
+    print(get_variables_as_constants_by_key())
     # print(get_predicates_by_constant(predicates, 5))
     # print(get_predicates_by_constant(predicates, 6))
-    print(choose_models(2))
+    # print(choose_models(2))
 
 
 if __name__ == "__main__":

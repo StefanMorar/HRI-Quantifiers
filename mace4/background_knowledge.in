@@ -2,7 +2,7 @@ assign(max_models, -1).
 set(arithmetic).
 
 formulas(background_knowledge).
-kitchenUnit(x) -> kitchenware(x).
+    kitchenUnit(x) -> kitchenware(x).
     kitchenTool(x) -> kitchenware(x).
     kitchenCounter(x) -> kitchenUnit(x).
     kitchenCabinet(x) -> kitchenUnit(x).
@@ -29,7 +29,7 @@ kitchenUnit(x) -> kitchenware(x).
     bowl(x) -> -cuttingTool(x).
     peeledOnion(x) -> -peeledRedOnion(x).
 
-    abe(x) & (food(y)) -> fetch(x, y).
+    abe(x) & food(y) -> fetch(x, y).
     -abe(x) -> -fetch(x, y).
     -food(x) -> -fetch(y, x).
 

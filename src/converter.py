@@ -1,297 +1,156 @@
+import json
+import os
 import re
-import string
-from itertools import combinations
 
-import inflect
-import nltk
-from word2number import w2n
+import openai
+from dotenv import load_dotenv
 
-ambiguous_quantifiers = {
-    'many': 10,
-    'some': 2,
-    'few': 2
-}
+from command import execute_command
+from evaluator import evaluate_fol_cardinality_expression, evaluate_fol_expression
+from model_selector import get_variables_as_constants_by_key
 
-
-def get_predicate(tagged_token):
-    match tagged_token[1]:
-        case 'NN':
-            return tagged_token[0]
-        case 'JJ':
-            return tagged_token[0]
-        case 'NNS':
-            p = inflect.engine()
-            return p.singular_noun(tagged_token[0])
+load_dotenv()
+openai.api_key = os.getenv('OPENAI_API_KEY')
+model = os.getenv('OPENAI_FINE_TUNED_MODEL')
+max_tokens = int(os.getenv('OPENAI_FINE_TUNED_MAX_TOKENS'))
 
 
-def get_tag_string(tagged_tokens):
-    return ''.join('<{}>'.format(tagged_token[1]) for tagged_token in tagged_tokens)
+def generate_completion(sentence):
+    res = openai.Completion.create(model=model, prompt=sentence + ' ->', stop=']}', max_tokens=max_tokens)
+    # print(res.choices[0].text + ']}')
+    # return res.choices[0].text + ']}'
+    # hardcoded conversion to reduce usage costs
+    return "{'type':'command','expressions':[['|exists x1 (onion(x1)).| >= 2']],'commands':['abe(x0) & onion(x1) -> fetch(x0, x1).']}"
 
 
-def get_inner_expression(sign_predicates, variable_number):
-    return ' & '.join(
-        [('' if sign_predicate[1] == '+' else '-') + '{}(x{})'.format(sign_predicate[0], variable_number) for
-         sign_predicate in sign_predicates])
+def create_variable_restrictions_dictionary(expressions):
+    dictionary = {}
+    for expression in expressions:
+        variable_match = re.search(r'exists\s(\w+)', expression)
+        if not variable_match:
+            return None
+
+        quantifier_match = re.search(r'\d+$', expression)
+        if quantifier_match:
+            digits = quantifier_match.group()
+            dictionary[variable_match.group(1)] = int(digits)
+        else:
+            dictionary[variable_match.group(1)] = 'INF'
+    return dictionary
 
 
-def generate_exists_expression(positive_predicate_tagged_tokens, negative_predicate_tagged_tokens, no_variables):
-    signs = ['+'] * len(positive_predicate_tagged_tokens) + ['-'] * len(negative_predicate_tagged_tokens)
-    predicates = [get_predicate(t) for t in positive_predicate_tagged_tokens + negative_predicate_tagged_tokens]
+def get_command_predicate(command_conclusion):
+    command_conclusion = command_conclusion.replace(' ', '')
+    predicate_pattern = r'\b([a-zA-Z]+)\('
+    predicate_matches = re.findall(predicate_pattern, command_conclusion)
+    return predicate_matches[0]
 
-    sign_predicates = list(zip(predicates, signs))
-    no_predicates = len(sign_predicates) * no_variables
-    if no_predicates == 0:
-        return ''
-    else:
-        inner_expression = ''
-        for iterator in range(no_variables):
-            partial_inner_expression = get_inner_expression(sign_predicates, iterator)
-            if iterator == 0:
-                inner_expression = partial_inner_expression
+
+def get_command_predicate_arguments(command_conclusion):
+    arguments_pattern = r'\((.*?)\)'
+    arguments_match = re.search(arguments_pattern, command_conclusion)
+    return arguments_match.group(1).split(',')
+
+
+def get_command_variables(predicate_arguments):
+    return [item for item in predicate_arguments if item[0].islower()]
+
+
+def create_exists_expression(command_premise, command_conclusion):
+    arguments = get_command_predicate_arguments(command_conclusion.replace(' ', ''))
+    variables = get_command_variables(arguments)
+    outer_expression = ' '.join(['exists ' + variable for variable in variables])
+    inner_expression = '&'.join([command_premise, command_conclusion])
+    return f'{outer_expression} ({inner_expression}).', arguments
+
+
+def preprocess_command(command):
+    command_premise, command_conclusion = command.split('->')
+    expression, arguments = create_exists_expression(command_premise, command_conclusion[:-1])
+    return get_command_predicate(command_conclusion), expression, arguments
+
+
+def create_variable_values_dictionary(variables):
+    variable_values = get_variables_as_constants_by_key()
+    if len(variables) != len(variable_values):
+        return None
+    dictionary = {}
+    for iterator in range(len(variables)):
+        dictionary[variables[iterator]] = variable_values[iterator]
+    return dictionary
+
+
+def get_command_parameters(predicate_arguments, variable_values_dictionary, variable_restrictions_dictionary):
+    command_parameters = []
+    for predicate_argument in predicate_arguments:
+        if predicate_argument[0].isupper():
+            command_parameters.append([predicate_argument])
+        elif predicate_argument in variable_restrictions_dictionary:
+            nr_models = variable_restrictions_dictionary[predicate_argument]
+            if nr_models == 'INF':
+                command_parameters.append(variable_values_dictionary[predicate_argument])
+            elif nr_models > len(variable_values_dictionary[predicate_argument]):
+                return None
             else:
-                inner_expression = ' & '.join([inner_expression, partial_inner_expression])
-
-        variables = ['x{}'.format(current_variable) for current_variable in range(no_variables)]
-        if no_variables > 1:
-            variable_combinations = list(combinations(variables, 2))
-            c = ' & '.join(
-                '{} != {}'.format(variable_combination[0], variable_combination[1]) for variable_combination in
-                variable_combinations)
-            inner_expression = '{} & {}'.format(inner_expression, c)
-
-        outer_expression = 'exists ' + ' exists '.join(variables)
-        return '{} ({}).'.format(outer_expression, inner_expression)
+                command_parameters.append(variable_values_dictionary[predicate_argument][:nr_models])
+        else:
+            command_parameters.append(variable_values_dictionary[predicate_argument][0])
+    return command_parameters
 
 
-def generate_all_expression(premise_predicate_tagged_tokens, conclusion_predicate_tagged_tokens,
-                            conclusion_predicate_sign):
-    premise_predicates = [get_predicate(t) for t in premise_predicate_tagged_tokens]
-    conclusion_predicates = [get_predicate(t) for t in conclusion_predicate_tagged_tokens]
-    sign_premise_predicates = list(zip(premise_predicates, ['+'] * len(premise_predicates)))
-    sign_conclusion_predicates = list(zip(conclusion_predicates,
-                                          [conclusion_predicate_sign] * len(conclusion_predicates)))
-    premise_inner_expression = get_inner_expression(sign_premise_predicates, 0)
-    conclusion_inner_expression = get_inner_expression(sign_conclusion_predicates, 0)
-    return 'all x0 ({} -> {}).'.format(premise_inner_expression, conclusion_inner_expression)
+def process_command(expressions, command):
+    predicate, expression, predicate_arguments = preprocess_command(command)
+    print(expression)
 
-
-def validate_noun_phrase(tagged_tokens):
-    noun_phrase_pattern = r'^(\<JJ\>)?\<(NNS|NN)\>$'
-    return True if re.match(noun_phrase_pattern, get_tag_string(tagged_tokens)) else False
-
-
-def validate_quantifier(tagged_tokens):
-    quantifier_pattern = r'^\<CD\>$'
-    return True if re.match(quantifier_pattern, get_tag_string(tagged_tokens)) else False
-
-
-def get_numeric_digits(word):
-    match = re.match(r'^[0-9]*$', word)
-    if match:
-        return int(word)
-    return w2n.word_to_num(word)
-
-
-def generate_integer_quantifier(tagged_tokens):
-    if tagged_tokens[0][0] == 'twice':
-        return 2
-    if tagged_tokens[0][0] == 'thrice':
-        return 3
-
-
-def generate_as_many_than_expression(match):
-    quantifier = nltk.pos_tag(nltk.word_tokenize(match.group(1)))
-    noun_phrase1 = nltk.pos_tag(nltk.word_tokenize(match.group(2)))
-    noun_phrase2 = nltk.pos_tag(nltk.word_tokenize(match.group(3)))
-    if (not validate_noun_phrase(noun_phrase1)) | (not validate_noun_phrase(noun_phrase2)):
+    if evaluate_fol_expression(expression) < 1:
         return None
 
-    return '|{}| == {} * |{}|'.format(generate_exists_expression(noun_phrase1, [], 1),
-                                      generate_integer_quantifier(quantifier),
-                                      generate_exists_expression(noun_phrase2, [], 1))
+    variables = get_command_variables(predicate_arguments)
+
+    restrictions_dictionary = create_variable_restrictions_dictionary(expressions)
+    print(restrictions_dictionary)
+
+    values_dictionary = create_variable_values_dictionary(variables)
+    print(values_dictionary)
+
+    command_parameters = get_command_parameters(predicate_arguments, values_dictionary, restrictions_dictionary)
+    print(command_parameters)
+
+    execute_command(predicate, command_parameters)
 
 
-def generate_times_more_than_expression(match):
-    quantifier = nltk.pos_tag(nltk.word_tokenize(match.group(1)))
-    noun_phrase1 = nltk.pos_tag(nltk.word_tokenize(match.group(2)))
-    noun_phrase2 = nltk.pos_tag(nltk.word_tokenize(match.group(3)))
-    if (not validate_quantifier(quantifier)) | (not validate_noun_phrase(noun_phrase1)) | (
-            not validate_noun_phrase(noun_phrase2)):
+def process_commands(expressions, commands):
+    if len(expressions) != len(commands):
         return None
-
-    return '|{}| == {} * |{}|'.format(generate_exists_expression(noun_phrase1, [], 1),
-                                      get_numeric_digits(quantifier[0][0]),
-                                      generate_exists_expression(noun_phrase2, [], 1))
+    for iterator in range(len(commands)):
+        process_command(expressions[iterator], commands[iterator])
 
 
-def generate_most_expression(match):
-    noun_phrase1 = nltk.pos_tag(nltk.word_tokenize(match.group(1)))
-    noun_phrase2 = nltk.pos_tag(nltk.word_tokenize(match.group(2)))
-    if (not validate_noun_phrase(noun_phrase1)) | (not validate_noun_phrase(noun_phrase2)):
-        return None
-
-    return '|{}| > |{}|'.format(generate_exists_expression(noun_phrase1 + noun_phrase2, [], 1),
-                                generate_exists_expression(noun_phrase1, noun_phrase2, 1))
-
-
-def generate_numeric_expression(match, operator):
-    quantifier = nltk.pos_tag(nltk.word_tokenize(match.group(1)))
-    noun_phrase = nltk.pos_tag(nltk.word_tokenize(match.group(2)))
-    if (not validate_quantifier(quantifier)) | (not validate_noun_phrase(noun_phrase)):
-        return None
-
-    return '|{}| {} {}'.format(generate_exists_expression(noun_phrase, [], 1), operator,
-                               get_numeric_digits(quantifier[0][0]))
+def process_queries(expressions):
+    results = []
+    for expression in expressions:
+        evaluation = evaluate_fol_cardinality_expression(expression)
+        if evaluation == -3:
+            results.append('Syntax error while processing the query')
+        elif evaluation == -2:
+            results.append('Query contains unknown predicates')
+        else:
+            results.append(evaluation)
+    return results
 
 
-def generate_query_expression(match):
-    noun_phrase = nltk.pos_tag(nltk.word_tokenize(match.group(1)))
-    if not validate_noun_phrase(noun_phrase):
-        return None
-
-    return '|{}|'.format(generate_exists_expression(noun_phrase, [], 1))
-
-
-def generate_ambiguous_quantifier_expression(match, operator, quantifier):
-    noun_phrase = nltk.pos_tag(nltk.word_tokenize(match.group(1)))
-    if not validate_noun_phrase(noun_phrase):
-        return None
-
-    return '|{}| {} {}'.format(generate_exists_expression(noun_phrase, [], 1), operator, quantifier)
-
-
-def generate_more_expression(match, operator):
-    noun_phrase1 = nltk.pos_tag(nltk.word_tokenize(match.group(1)))
-    noun_phrase2 = nltk.pos_tag(nltk.word_tokenize(match.group(2)))
-    if (not validate_noun_phrase(noun_phrase1)) | (not validate_noun_phrase(noun_phrase2)):
-        return None
-
-    return '|{}| {} |{}|'.format(generate_exists_expression(noun_phrase1, [], 1), operator,
-                                 generate_exists_expression(noun_phrase2, [], 1))
-
-
-def generate_negated_exists_expression(match):
-    noun_phrase1 = nltk.pos_tag(nltk.word_tokenize(match.group(1)))
-    noun_phrase2 = nltk.pos_tag(nltk.word_tokenize(match.group(2)))
-    if (not validate_noun_phrase(noun_phrase1)) | (not validate_noun_phrase(noun_phrase2)):
-        return None
-
-    return '|-({}).| > 0'.format(generate_exists_expression(noun_phrase1 + noun_phrase2, [], 1)[:-1])
-
-
-def generate_simple_negated_exists_expression(match):
-    noun_phrase = nltk.pos_tag(nltk.word_tokenize(match.group(1)))
-    if not validate_noun_phrase(noun_phrase):
-        return None
-
-    return '|-({}).| > 0'.format(generate_exists_expression(noun_phrase, [], 1)[:-1])
-
-
-def generate_all_every_expression(match, conclusion_sign):
-    noun_phrase1 = nltk.pos_tag(nltk.word_tokenize(match.group(1)))
-    noun_phrase2 = nltk.pos_tag(nltk.word_tokenize(match.group(2)))
-    if (not validate_noun_phrase(noun_phrase1)) | (not validate_noun_phrase(noun_phrase2)):
-        return None
-
-    return generate_all_expression(noun_phrase1, noun_phrase2, conclusion_sign)
-
-
-def preprocess_sentence(sentence):
-    lowercase_no_extra_spaces_sentence = ' '.join(sentence.lower().split())
-    return ''.join(char for char in lowercase_no_extra_spaces_sentence if char not in string.punctuation)
-
-
-def generate_expression(sentence):
-    sentence = preprocess_sentence(sentence)
-
-    match = re.match(r'there are (.*) as many (.*) than (.*)', sentence)
-    if match:
-        return generate_as_many_than_expression(match)
-
-    match = re.match(r'there are ([a-zA-Z0-9]*) times more (.*) than (.*)', sentence)
-    if match:
-        return generate_times_more_than_expression(match)
-
-    match = re.match(r'most (.*) are (.*)', sentence)
-    if match:
-        return generate_most_expression(match)
-
-    match = re.match(r'there are exactly ([a-zA-Z0-9]*) (.*)', sentence)
-    if match:
-        return generate_numeric_expression(match, '==')
-
-    match = re.match(r'there are at least ([a-zA-Z0-9]*) (.*)', sentence)
-    if match:
-        return generate_numeric_expression(match, '>=')
-
-    match = re.match(r'there are at most ([a-zA-Z0-9]*) (.*)', sentence)
-    if match:
-        return generate_numeric_expression(match, '<=')
-
-    match = re.match(r'there are more than ([a-zA-Z0-9]*) (.*)', sentence)
-    if match:
-        return generate_numeric_expression(match, '>')
-
-    match = re.match(r'there are less than ([a-zA-Z0-9]*) (.*)', sentence)
-    if match:
-        return generate_numeric_expression(match, '>')
-
-    match = re.match(r'there are more (.*) than (.*)', sentence)
-    if match:
-        return generate_more_expression(match, '>')
-
-    match = re.match(r'there are less (.*) than (.*)', sentence)
-    if match:
-        return generate_more_expression(match, '<')
-
-    match = re.match(r'there are many (.*)', sentence)
-    if match:
-        return generate_ambiguous_quantifier_expression(match, '>=', ambiguous_quantifiers['many'])
-
-    match = re.match(r'there are few (.*)', sentence)
-    if match:
-        return generate_ambiguous_quantifier_expression(match, '>=', ambiguous_quantifiers['few'])
-
-    match = re.match(r'there are no (.*)', sentence)
-    if match:
-        return generate_simple_negated_exists_expression(match)
-
-    match = re.match(r'there are ([a-zA-Z0-9]*) (.*)', sentence)
-    if match:
-        return generate_numeric_expression(match, '>=')
-
-    match = re.match(r'how many (.*) are there', sentence)
-    if match:
-        return generate_query_expression(match)
-
-    match = re.match(r'no (.*) is a (.*)', sentence)
-    if match:
-        return generate_negated_exists_expression(match)
-
-    match = re.match(r'all (.*) are not (.*)', sentence)
-    if match:
-        return generate_all_every_expression(match, '-')
-
-    match = re.match(r'all (.*) are (.*)', sentence)
-    if match:
-        return generate_all_every_expression(match, '+')
-
-    match = re.match(r'every (.*) is not(?: an? )?(.*)', sentence)
-    if match:
-        return generate_all_every_expression(match, '-')
-
-    match = re.match(r'every (.*) is(?: an? )?(.*)', sentence)
-    if match:
-        return generate_all_every_expression(match, '+')
-
+def process_completion(completion):
+    completion = completion.replace("'", "\"")
+    json_completion = json.loads(completion)
+    if json_completion['type'] == 'query':
+        process_queries(json_completion['expressions'])
+    elif json_completion['type'] == 'command':
+        process_commands(json_completion['expressions'], json_completion['commands'])
     return None
 
 
 def main():
-    print(generate_expression('All boxes are objects'))
-    print(generate_expression('All boxes are not objects'))
-    print(generate_expression('Every object is a box'))
-    print(generate_expression('Every object is not a box'))
+    process_completion(generate_completion('Fetch 2 onions'))
 
 
 if __name__ == "__main__":

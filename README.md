@@ -27,6 +27,7 @@
 - word2number: `pip install word2number`
 - requests: `pip install requests`
 - python-dotenv: `pip install python-dotenv`
+- OpenAI CLI: `pip install --upgrade openai`
 
 ## Execution
 
