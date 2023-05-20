@@ -1,3 +1,6 @@
+assign(max_models, -1).
+set(arithmetic).
+
 formulas(background_knowledge_classification).
     kitchenUnit(x) -> kitchenware(x).
     kitchenTool(x) -> kitchenware(x).
