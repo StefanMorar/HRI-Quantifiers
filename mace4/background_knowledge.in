@@ -35,6 +35,8 @@ formulas(background_knowledge_classification).
     cheese(x) -> ingredient(x).
     sugarBag(x) -> ingredient(x).
     butterBag(x) -> ingredient(x).
+    bacon(x) -> ingredient(x).
+    fragment(x) -> ingredient(x).
 
     onion(x) -> vegetable(x).
     pepper(x) -> vegetable(x).
@@ -54,6 +56,11 @@ formulas(background_knowledge_classification).
     greenChiliPepper(x) -> pepper(x).
 
     fetaCheese(x) -> cheese(x).
+
+    choppedOnion(x) -> fragment(x).
+    choppedRedOnion(x) -> fragment(x).
+    choppedBroccoli(x) -> fragment(x).
+    choppedBacon(x) -> fragment(x).
 end_of_list.
 
 formulas(background_knowledge_distinction).
@@ -90,12 +97,23 @@ formulas(background_knowledge_distinction).
     fruit(x) -> -cheese(x).
     fruit(x) -> -sugarBag(x).
     fruit(x) -> -butterBag(x).
+    fruit(x) -> -bacon(x).
+    fruit(x) -> -fragment(x).
     vegetable(x) -> -cheese(x).
     vegetable(x) -> -sugarBag(x).
     vegetable(x) -> -butterBag(x).
+    vegetable(x) -> -bacon(x).
+    vegetable(x) -> -fragment(x).
     cheese(x) -> -sugarBag(x).
     cheese(x) -> -butterBag(x).
+    cheese(x) -> -bacon(x).
+    cheese(x) -> -fragment(x).
     sugarBag(x) -> -butterBag(x).
+    sugarBag(x) -> -bacon(x).
+    sugarBag(x) -> -fragment(x).
+    butterBag(x) -> -bacon(x).
+    butterBag(x) -> -fragment(x).
+    bacon(x) -> -fragment(x).
 
     onion(x) -> -pepper(x).
     onion(x) -> -broccoli(x).
@@ -118,46 +136,11 @@ formulas(background_knowledge_distinction).
     avocado(x) -> -tomato(x).
     avocado(x) -> -apple(x).
     tomato(x) -> -apple(x).
-end_of_list.
 
-formulas(background_knowledge_commands).
-    abe(x0) & (ingredient(x1) | kitchenTool(x1) | bakingSupply(x1)) -> fetch(x0, x1).
-    -abe(x0) -> -fetch(x0, x1).
-    -ingredient(x1) & -kitchenTool(x1) & -bakingSupply(x1) -> -fetch(x0, x1).
-
-    abe(x0) & ingredient(x1) & cuttingTool(x2) -> cut(x0, x1, x2).
-    -abe(x0) -> -cut(x0, x1, x2).
-    -ingredient(x1) -> -cut(x0, x1, x2).
-    -cuttingTool(x2) -> -cut(x0, x1, x2).
-
-    abe(x0) & bakingSheet(x1) & bakingTray(x2) -> line(x0, x1, x2).
-    -abe(x0) -> -line(x0, x1, x2).
-    -bakingSheet(x1) -> -line(x0, x1, x2).
-    -bakingTray(x2) -> -line(x0, x1, x2).
-
-    abe(x0) & bowl(x1) & mixingTool(x2) -> mix(x0, x1, x2).
-    -abe(x0) -> -mix(x0, x1, x2).
-    -bowl(x1) -> -mix(x0, x1, x2).
-    -mixingTool(x2) -> -mix(x0, x1, x2).
-
-    abe(x0) & container(x1) & container(x2) -> transfer(x0, x1, x2).
-    -abe(x0) -> -transfer(x0, x1, x2).
-    -container(x1) -> -transfer(x0, x1, x2).
-    -container(x2) -> -transfer(x0, x1, x2).
-
-    abe(x0) & sugarBag(x1) & bakingTray(x2) -> sprinkle(x0, x1, x2).
-    -abe(x0) -> -sprinkle(x0, x1, x2).
-    -sugarBag(x1) -> -sprinkle(x0, x1, x2).
-    -bakingTray(x2) -> -sprinkle(x0, x1, x2).
-
-    abe(x0) & container(x1) & container(x2) -> shape(x0, x1, x2).
-    -abe(x0) -> -shape(x0, x1, x2).
-    -container(x1) -> -shape(x0, x1, x2).
-    -container(x2) -> -shape(x0, x1, x2).
-
-    abe(x0) & container(x1) & oven(x2) & kitchenCounter(x3) -> bake(x0, x1, x2, x3).
-    -abe(x0) -> -bake(x0, x1, x2, x3).
-    -container(x1) -> -bake(x0, x1, x2, x3).
-    -oven(x2) -> -bake(x0, x1, x2, x3).
-    -kitchenCounter(x3) -> -bake(x0, x1, x2, x3).
+    choppedOnion(x) -> -choppedRedOnion(x).
+    choppedOnion(x) -> -choppedBroccoli(x).
+    choppedOnion(x) -> -choppedBacon(x).
+    choppedRedOnion(x) -> -choppedBroccoli(x).
+    choppedRedOnion(x) -> -choppedBacon(x).
+    choppedBroccoli(x) -> -choppedBacon(x).
 end_of_list.

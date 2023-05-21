@@ -1,15 +1,27 @@
-assign(domain_size, 10).
+assign(domain_size, 22).
 
 formulas(sensors).
 	floor(Floor).
 	abe(Abe).
 	kitchenCounter(KitchenCounter).
 	kitchenCabinet(KitchenCabinet).
+	oven(Oven).
 	cuttingBoard(CuttingBoard).
+	bakingTray(BakingTray1).
+	bakingTray(BakingTray2).
+	bakingSheet(BakingSheet1).
+	bakingSheet(BakingSheet2).
+	whisk(Whisk).
+	cookingKnife(CookingKnife).
 	peeledOnion(BrownOnion).
 	peeledRedOnion(RedOnion1).
 	peeledRedOnion(RedOnion2).
+	broccoli(Broccoli1).
+	broccoli(Broccoli2).
+	sugarBag(SugarBag).
+	butterBag(ButterBag).
 	largeBowl(LargeBowl).
-	cookingKnife(CookingKnife).
-	Floor = 0. Abe = 1. KitchenCounter = 2. KitchenCabinet = 3. CuttingBoard = 4. BrownOnion = 5. RedOnion1 = 6. RedOnion2 = 7. LargeBowl = 8. CookingKnife = 9. 
+	mediumBowl(MediumBowl1).
+	mediumBowl(MediumBowl2).
+	Floor = 0. Abe = 1. KitchenCounter = 2. KitchenCabinet = 3. Oven = 4. CuttingBoard = 5. BakingTray1 = 6. BakingTray2 = 7. BakingSheet1 = 8. BakingSheet2 = 9. Whisk = 10. CookingKnife = 11. BrownOnion = 12. RedOnion1 = 13. RedOnion2 = 14. Broccoli1 = 15. Broccoli2 = 16. SugarBag = 17. ButterBag = 18. LargeBowl = 19. MediumBowl1 = 20. MediumBowl2 = 21. 
 end_of_list.

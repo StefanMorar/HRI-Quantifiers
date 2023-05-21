@@ -17,10 +17,11 @@ max_tokens = int(os.getenv('OPENAI_FINE_TUNED_MAX_TOKENS'))
 
 def generate_completion(sentence):
     res = openai.Completion.create(model=model, prompt=sentence + ' ->', stop=']}', max_tokens=max_tokens)
-    # print(res.choices[0].text + ']}')
-    # return res.choices[0].text + ']}'
+    completion = res.choices[0].text + ']}'
+    print('GPT-3:', completion)
+    return completion
     # hardcoded conversion to reduce usage costs
-    return "{'type':'command','expressions':[['|exists x1 (onion(x1)).| >= 2']],'commands':['abe(x0) & onion(x1) -> fetch(x0, x1).']}"
+    # return "{'type':'command','expressions':[['|exists x1 (onion(x1)).| >= 2']],'commands':['abe(x0) & onion(x1) -> fetch(x0, x1).']}"
 
 
 def create_variable_restrictions_dictionary(expressions):
@@ -94,7 +95,7 @@ def get_command_parameters(predicate_arguments, variable_values_dictionary, vari
             else:
                 command_parameters.append(variable_values_dictionary[predicate_argument][:nr_models])
         else:
-            command_parameters.append(variable_values_dictionary[predicate_argument][0])
+            command_parameters.append([variable_values_dictionary[predicate_argument][0]])
     return command_parameters
 
 
