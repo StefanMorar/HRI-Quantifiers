@@ -47,9 +47,9 @@ def evaluate_fol_expression(expression, execution_type):
 
     os.system('python3 ' + script_file_path)
 
-    no_models = get_number_of_models()
+    no_of_models = get_number_of_models()
 
-    return no_models
+    return no_of_models
 
 
 def get_predicates(content):
@@ -102,8 +102,8 @@ def evaluate_fol_cardinality_expression(expression):
         return evaluate_fol_expression(expression, ExpressionType.query)
 
     for fol_expression in fol_expressions:
-        nr_models = evaluate_fol_expression(fol_expression, ExpressionType.query)
-        expression = re.sub(r'\|{}\|'.format(re.escape(fol_expression)), str(nr_models), expression)
+        no_of_models = evaluate_fol_expression(fol_expression, ExpressionType.query)
+        expression = re.sub(r'\|{}\|'.format(re.escape(fol_expression)), str(no_of_models), expression)
 
     try:
         return eval(expression)

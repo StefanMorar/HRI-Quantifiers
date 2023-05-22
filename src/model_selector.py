@@ -34,13 +34,13 @@ def read_models():
 
 
 def get_number_of_models():
-    no_models = 0
+    no_of_models = 0
     with open(output_file_path, 'r') as file:
         for line in file:
             if number_of_models_marker in line:
-                no_models = line.split()[2]
-    if no_models.isdigit():
-        return no_models
+                no_of_models = line.split()[2]
+    if no_of_models.isdigit():
+        return int(no_of_models)
     return 0
 
 
