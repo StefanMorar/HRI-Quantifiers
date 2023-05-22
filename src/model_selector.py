@@ -1,72 +1,75 @@
-import json
 import os
 import re
 
 mace4_directory_path = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'mace4')
 output_file_path = os.path.join(mace4_directory_path, 'result.out')
 
+model_start_marker = '============================== MODEL ================================='
+model_end_marker = '============================== end of model =========================='
+number_of_models_marker = 'Exiting with'
+
+
+def convert_line_to_portable_element(line):
+    line = line.replace("\n", "").strip()
+    word_match = r'\w+'
+    arguments = re.findall(word_match, line)
+    arguments = [int(arg) if arg.isdigit() else arg for arg in arguments]
+    return arguments
+
 
 def read_models():
-    with open(output_file_path, 'r') as file:
-        contents = file.read()
-        try:
-            models = json.loads(contents)
-        except ValueError:
-            return None
+    models = []
+    current_model = []
+    with open(output_file_path, 'r') as input_file:
+        for line in input_file:
+            if line.isspace():
+                continue
+            if model_start_marker in line:
+                current_model = []
+            elif model_end_marker in line:
+                models.append(current_model)
+            elif 'function' in line:
+                current_model.append(convert_line_to_portable_element(line))
     return models
 
 
-def get_no_models():
-    models = read_models()
-    if models is None:
-        return 0
-    return len(models)
+def get_number_of_models():
+    no_models = 0
+    with open(output_file_path, 'r') as file:
+        for line in file:
+            if number_of_models_marker in line:
+                no_models = line.split()[2]
+    if no_models.isdigit():
+        return no_models
+    return 0
 
 
-def get_constants_or_variables(functions_and_relations, return_variables):
-    functions = [element for element in functions_and_relations if element[0] == 'function']
+def get_constants_or_variables(functions, return_variables):
     variable_pattern = '^c\\d+$'
     dictionary = {}
     for function in functions:
         match = re.match(variable_pattern, function[1])
         if return_variables and match:
-            dictionary[function[1]] = function[3]
+            dictionary[function[1]] = function[2]
         elif not return_variables and not match:
-            dictionary[function[3]] = function[1]
+            dictionary[function[2]] = function[1]
     return dictionary
 
 
 def get_constants(models):
-    return get_constants_or_variables(models[0][2], False)
+    return get_constants_or_variables(models[0], False)
 
 
 def get_variables(models):
     variable_dictionaries = []
     for model in models:
-        variables = get_constants_or_variables(model[2], True)
+        variables = get_constants_or_variables(model, True)
         variable_dictionaries.append(variables)
     return variable_dictionaries
 
 
 def get_variables_by_model(variable_dictionaries):
     return [list(variable_dictionary.values()) for variable_dictionary in variable_dictionaries]
-
-
-def get_predicates(models):
-    functions_and_relations = models[0][2]
-    relations = [element for element in functions_and_relations if element[0] == 'relation']
-    predicates = ()
-    for relation in relations:
-        predicates = predicates + ((relation[1], relation[3]),)
-    return predicates
-
-
-def get_predicates_by_constant(predicates, constant):
-    true_predicates = []
-    for predicate in predicates:
-        if predicate[1][constant] == 1:
-            true_predicates.append(predicate[0])
-    return true_predicates
 
 
 def get_variables_by_key(variable_dictionaries):
@@ -87,29 +90,11 @@ def get_variables_as_constants_by_key():
     return [[constants[variable] for variable in single_model_variables] for single_model_variables in variables]
 
 
-def choose_models(nr_models):
-    models = read_models()
-    if nr_models > len(models):
-        return None
-    variables = get_variables_by_model(get_variables(models))
-    # TODO: choose models based on some rules instead of always returning the first ones
-    constants = get_constants(models)
-    return [[constants[variable] for variable in single_model_variables] for single_model_variables in
-            variables[:nr_models]]
-
-
 def main():
-    # models = read_models()
-    # predicates = get_predicates(models)
-    # print(predicates)
-    # print(get_constants(models))
-    # variables = get_variables(models)
-    # print(variables)
-    # print(get_variables_by_model(variables))
+    models = read_models()
+    print(get_constants(models))
+    print(get_variables(models))
     print(get_variables_as_constants_by_key())
-    # print(get_predicates_by_constant(predicates, 5))
-    # print(get_predicates_by_constant(predicates, 6))
-    # print(choose_models(2))
 
 
 if __name__ == "__main__":

@@ -1,7 +1,8 @@
 import os
 import re
 
-from model_selector import get_no_models
+from enums import ExpressionType
+from model_selector import get_number_of_models
 from utils import to_lowercase_first_character_string, to_uppercase_first_character_string
 
 mace4_directory_path = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'mace4')
@@ -11,9 +12,16 @@ sensors_file_path = os.path.join(mace4_directory_path, 'sensors.in')
 background_knowledge_file_path = os.path.join(mace4_directory_path, 'background_knowledge.in')
 output_file_path = os.path.join(mace4_directory_path, 'result.out')
 
+bk_classification_formulas_start_pattern = r'formulas\(background_knowledge_classification\)\.'
+bk_distinction_formulas_start_pattern = r'formulas\(background_knowledge_classification\)\.'
+bk_commands_formulas_start_pattern = r'formulas\(background_knowledge_commands\)\.'
+bk_formulas_end_pattern = r'end_of_list\.'
 
-def prepare_expression_file(expression):
+
+def prepare_expression_file(expression, execution_type):
     with open(expression_file_path, 'w') as file:
+        if execution_type == ExpressionType.query:
+            file.write('clear(print_models).\n\n')
         file.write('formulas(commands).\n')
         file.write(f'\t{expression}\n')
         file.write('end_of_list.')
@@ -34,12 +42,12 @@ def prepare_sensors_file(predicates):
         file.write('\nend_of_list.')
 
 
-def evaluate_fol_expression(expression):
-    prepare_expression_file(expression)
+def evaluate_fol_expression(expression, execution_type):
+    prepare_expression_file(expression, execution_type)
 
     os.system('python3 ' + script_file_path)
 
-    no_models = get_no_models()
+    no_models = get_number_of_models()
 
     return no_models
 
@@ -53,16 +61,23 @@ def get_predicates(content):
     return predicates
 
 
+def get_predicates_between_markers(start_pattern, end_pattern, content):
+    start_position = re.search(start_pattern, content).end()
+    end_position = re.search(end_pattern, content).start()
+    return get_predicates(content[start_position:end_position])
+
+
 def get_background_knowledge_predicates():
     with open(background_knowledge_file_path, 'r') as file:
         content = file.read()
 
-    start_pattern = r'formulas\(background_knowledge\)\.'
-    end_pattern = r'end_of_list\.'
-    start_pos = re.search(start_pattern, content).end()
-    end_pos = re.search(end_pattern, content).start()
-
-    return get_predicates(content[start_pos:end_pos])
+    classification_predicates = get_predicates_between_markers(bk_classification_formulas_start_pattern,
+                                                               bk_formulas_end_pattern, content)
+    distinction_predicates = get_predicates_between_markers(bk_distinction_formulas_start_pattern,
+                                                            bk_formulas_end_pattern, content)
+    command_predicates = get_predicates_between_markers(bk_commands_formulas_start_pattern,
+                                                        bk_formulas_end_pattern, content)
+    return classification_predicates.union(distinction_predicates, command_predicates)
 
 
 def preprocess_predicates(expression):
@@ -84,10 +99,10 @@ def evaluate_fol_cardinality_expression(expression):
     fol_expressions = re.findall(r'\|([^|]+)\|', expression)
 
     if len(fol_expressions) == 0:
-        return evaluate_fol_expression(expression)
+        return evaluate_fol_expression(expression, ExpressionType.query)
 
     for fol_expression in fol_expressions:
-        nr_models = evaluate_fol_expression(fol_expression)
+        nr_models = evaluate_fol_expression(fol_expression, ExpressionType.query)
         expression = re.sub(r'\|{}\|'.format(re.escape(fol_expression)), str(nr_models), expression)
 
     try:
@@ -97,9 +112,9 @@ def evaluate_fol_cardinality_expression(expression):
 
 
 def main():
-    print(evaluate_fol_cardinality_expression('|exists x (onion(x)).| == 2 * |exists x (largeBowl(x)).|'))
-    print(evaluate_fol_cardinality_expression('all x0 (food(x0) -> onion(x0)).'))
-    print(evaluate_fol_cardinality_expression('|exists x0 (food(x0) & peeledRedOnion(x0)).|'))
+    print(evaluate_fol_cardinality_expression('|exists x (mediumBowl(x)).| == 2 * |exists x (largeBowl(x)).|'))
+    print(evaluate_fol_cardinality_expression('all x0 (ingredient(x0) -> onion(x0)).'))
+    print(evaluate_fol_cardinality_expression('|exists x0 (ingredient(x0) & peeledRedOnion(x0)).|'))
 
 
 if __name__ == "__main__":

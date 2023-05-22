@@ -6,6 +6,7 @@ import openai
 from dotenv import load_dotenv
 
 from command import execute_command
+from enums import ExpressionType
 from evaluator import evaluate_fol_cardinality_expression, evaluate_fol_expression
 from model_selector import get_variables_as_constants_by_key
 
@@ -103,7 +104,7 @@ def process_command(expressions, command):
     predicate, expression, predicate_arguments = preprocess_command(command)
     print(expression)
 
-    if evaluate_fol_expression(expression) < 1:
+    if evaluate_fol_expression(expression, ExpressionType.command) < 1:
         return None
 
     variables = get_command_variables(predicate_arguments)
@@ -143,11 +144,12 @@ def process_queries(expressions):
 def process_completion(completion):
     completion = completion.replace("'", "\"")
     json_completion = json.loads(completion)
-    if json_completion['type'] == 'query':
+    if json_completion['type'] == ExpressionType.query.value:
         process_queries(json_completion['expressions'])
-    elif json_completion['type'] == 'command':
+    elif json_completion['type'] == ExpressionType.command.value:
         process_commands(json_completion['expressions'], json_completion['commands'])
-    return None
+    else:
+        print('Invalid type')
 
 
 def main():
