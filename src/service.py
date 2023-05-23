@@ -5,6 +5,8 @@ from functools import wraps
 import requests
 from dotenv import load_dotenv
 
+from logger import logger
+
 load_dotenv()
 abe_sim_url = os.getenv('ABE_SIM_URL')
 has_state = False
@@ -16,7 +18,7 @@ def exception_handler(func):
         try:
             return func(*args, **kwargs)
         except requests.exceptions.RequestException as e:
-            print(f'Error occurred during {abe_sim_url} call in function {func.__name__}')
+            logger.error(f'Error occurred during {abe_sim_url} call in function {func.__name__}')
             raise SystemExit(e)
 
     return wrapper
@@ -26,7 +28,7 @@ def process_response(response):
     if response.status_code == 200:
         return response.json()['response']
     else:
-        print('Request failed with status code:', response.status_code)
+        logger.error('Request failed with status code:', response.status_code)
         return None
 
 

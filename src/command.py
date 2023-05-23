@@ -1,5 +1,6 @@
 import service
 from evaluator import prepare_sensors_file
+from logger import logger
 from utils import to_lowercase_first_character_string
 
 
@@ -89,7 +90,7 @@ def transfer(parameters):
 
 
 def execute_command(predicate, parameters):
-    print(f'Executing command {predicate} with parameters {parameters}')
+    logger.debug(f'Executing command {predicate} with parameters {parameters}')
     parameters = [[to_lowercase_first_character_string(item) for item in sublist] for sublist in parameters]
 
     if not service.has_state:
@@ -111,12 +112,20 @@ def execute_command(predicate, parameters):
     if predicate in command_functions:
         command_functions[predicate](parameters)
     else:
-        print(f'Invalid command: {predicate}')
+        logger.error(f'Invalid command: {predicate}')
 
 
 def main():
     execute_command('fetch', [['Abe'], ['RedOnion1', 'RedOnion2']])
     execute_command('cut', [['Abe'], ['RedOnion1'], ['CookingKnife']])
+    execute_command('line', [['Abe'], ['BakingTray1', 'BakingTray2'], ['BakingSheet1', 'BakingSheet2']])
+    # execute_command('transfer', [['Abe'], ['LargeBowl2'], ['LargeBowl']])
+    # execute_command('transfer', [['Abe'], ['LargeBowl2'], ['LargeBowl']])
+    # execute_command('line', [['Abe'], ['BakingTray1'], ['BakingSheet1']])
+    # execute_command('sprinkle', [['Abe'], ['BakingTray1'], ['SugarBag']])
+    execute_command('bake', [['Abe'], ['BakingTray1'], ['Oven'], ['KitchenCounter']])
+    # execute_command('mix', [['Abe'], ['LargeBowl'], ['Whisk']])
+    # execute_command('shape', [['Abe'], ['LargeBowl'], ['BakingTray1']])
 
 
 if __name__ == "__main__":

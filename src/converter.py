@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from command import execute_command
 from enums import ExpressionType
 from evaluator import evaluate_fol_cardinality_expression, evaluate_fol_expression
+from logger import logger
 from model_selector import get_variables_as_constants_by_key
 
 load_dotenv()
@@ -102,7 +103,7 @@ def get_command_parameters(predicate_arguments, variable_values_dictionary, vari
 
 def process_command(expressions, command):
     predicate, expression, predicate_arguments = preprocess_command(command)
-    print(expression)
+    logger.debug(f'Evaluating {expression}...')
 
     if evaluate_fol_expression(expression, ExpressionType.command) < 1:
         return None
@@ -110,13 +111,12 @@ def process_command(expressions, command):
     variables = get_command_variables(predicate_arguments)
 
     restrictions_dictionary = create_variable_restrictions_dictionary(expressions)
-    print(restrictions_dictionary)
+    logger.debug(f'Cardinality restrictions: {restrictions_dictionary}')
 
     values_dictionary = create_variable_values_dictionary(variables)
-    print(values_dictionary)
+    logger.debug(f'Possible values: {values_dictionary}')
 
     command_parameters = get_command_parameters(predicate_arguments, values_dictionary, restrictions_dictionary)
-    print(command_parameters)
 
     execute_command(predicate, command_parameters)
 
@@ -149,7 +149,7 @@ def process_completion(completion):
     elif json_completion['type'] == ExpressionType.command.value:
         process_commands(json_completion['expressions'], json_completion['commands'])
     else:
-        print('Invalid type')
+        logger.error('Invalid type')
 
 
 def main():
