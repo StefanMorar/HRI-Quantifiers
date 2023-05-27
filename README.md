@@ -36,14 +36,18 @@ Alternatively, each component can be executed independently:
 
 ### Queries
 
-- `There are twice as many onions than carrots` &rarr; `{'type':'query','expressions':['|exists x0 (onion(x0)).| == 2 * |exists x0 (carrot(x0)).|']}`
-- `Most vegetables are red onions` &rarr; `{'type':'query','expressions':['|exists x0 (vegetable(x0) & redOnion(x0)).| > |exists x0 (vegetable(x0) & -redOnion(x0)).|']}`
-- `There are exactly 2 ovens` &rarr; `{'type':'query','expressions':['|exists x0 (oven(x0)).| == 2']}`
+| Sentence                                    | Conversion                                                                                                                          |
+|---------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------|
+| There are twice as many onions than carrots | `{'type':'query','expressions':['\|exists x0 (onion(x0)).\| == 2 * \|exists x0 (carrot(x0)).\|']}`                                  |
+| There are twice as many onions than carrots | `{'type':'query','expressions':['\|exists x0 (vegetable(x0) & redOnion(x0)).\| > \|exists x0 (vegetable(x0) & -redOnion(x0)).\|']}` |
+| There are exactly 2 ovens                   | `{'type':'query','expressions':['\|exists x0 (oven(x0)).\| == 2']}`                                                                 |
 
 ### Commands
 
-- `Fetch a couple of red chilli peppers` &rarr; `{'type':'command','expressions':[['|exists x1 (redChilliPepper(x1)).| >= 2']],'commands':['abe(x0) & redChilliPepper(x1) -> fetch(x0, x1).']}`
-- `Cut several broccoli` &rarr; `{'type':'command','expressions':[['|exists x1 (broccoli(x1)).| >= 3']],'commands':['abe(x0) & broccoli(x1) & cuttingTool(x2) -> cut(x0, x1, x2).']}`
-- `Line a baking tray with paper` &rarr; `{'type':'command','expressions':[['|exists x1 (bakingSheet(x1)).| >= 1','|exists x2 (bakingTray(x2)).| >= 1']],'commands':['abe(x0) & bakingSheet(x1) & bakingTray(x2) -> line(x0, x1, x2).']}`
+| Sentence                             | Conversion                                                                                                                                                                                           |
+|--------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Fetch a couple of red chilli peppers | `{'type':'command','expressions':[['\|exists x1 (redChilliPepper(x1)).\| >= 2']],'commands':['abe(x0) & redChilliPepper(x1) -> fetch(x0, x1).']}`                                                    |
+| Cut several broccoli                 | `{'type':'command','expressions':[['\|exists x1 (broccoli(x1)).\| >= 3']],'commands':['abe(x0) & broccoli(x1) & cuttingTool(x2) -> cut(x0, x1, x2).']}`                                              |
+| Line a baking tray with paper        | `{'type':'command','expressions':[['\|exists x1 (bakingSheet(x1)).\| >= 1','\|exists x2 (bakingTray(x2)).\| >= 1']],'commands':['abe(x0) & bakingSheet(x1) & bakingTray(x2) -> line(x0, x1, x2).']}` |
 
 For more examples, check [train_data.csv](notebooks/data/train_data.csv).
