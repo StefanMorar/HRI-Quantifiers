@@ -4,6 +4,7 @@ import re
 
 import openai
 from dotenv import load_dotenv
+from openai.error import OpenAIError
 
 from command import execute_command
 from enums import ExpressionType
@@ -14,16 +15,28 @@ from model_selector import get_variables_as_constants_by_key
 load_dotenv()
 openai.api_key = os.getenv('OPENAI_API_KEY')
 model = os.getenv('OPENAI_FINE_TUNED_MODEL')
-max_tokens = int(os.getenv('OPENAI_FINE_TUNED_MAX_TOKENS'))
+max_tokens = os.getenv('OPENAI_FINE_TUNED_MAX_TOKENS')
+
+
+def get_max_tokens():
+    try:
+        return int(max_tokens)
+    except ValueError:
+        logger.error('Invalid max_tokens value. Stopping system...')
+        raise SystemExit()
 
 
 def generate_completion(sentence):
-    res = openai.Completion.create(model=model, prompt=sentence + ' ->', stop=']}', max_tokens=max_tokens)
-    completion = res.choices[0].text + ']}'
-    print('GPT-3:', completion)
-    return completion
-    # hardcoded conversion to reduce usage costs
-    # return "{'type':'command','expressions':[['|exists x1 (onion(x1)).| >= 2']],'commands':['abe(x0) & onion(x1) -> fetch(x0, x1).']}"
+    try:
+        res = openai.Completion.create(model=model, prompt=sentence + ' ->', stop=']}', max_tokens=get_max_tokens())
+        completion = res.choices[0].text + ']}'
+        logger.debug(f'GPT-3 completion: {completion}')
+        return completion
+        # hardcoded conversion to reduce usage costs
+        # return "{'type':'command','expressions':[['|exists x1 (onion(x1)).| >= 2']],'commands':['abe(x0) & onion(x1) -> fetch(x0, x1).']}"
+    except OpenAIError as e:
+        logger.error(json.dumps(e.error))
+        return None
 
 
 def create_variable_restrictions_dictionary(expressions):
@@ -101,7 +114,7 @@ def get_command_parameters(predicate_arguments, variable_values_dictionary, vari
     return command_parameters
 
 
-def process_command(expressions, command):
+def prepare_command(expressions, command):
     predicate, expression, predicate_arguments = preprocess_command(command)
     logger.debug(f'Evaluating {expression}...')
 
@@ -118,14 +131,25 @@ def process_command(expressions, command):
 
     command_parameters = get_command_parameters(predicate_arguments, values_dictionary, restrictions_dictionary)
 
+    return predicate, command_parameters
+
+
+def process_command(expressions, command):
+    predicate, command_parameters = prepare_command(expressions, command)
+
     execute_command(predicate, command_parameters)
+
+    return predicate, command_parameters
 
 
 def process_commands(expressions, commands):
     if len(expressions) != len(commands):
         return None
+    results = []
     for iterator in range(len(commands)):
-        process_command(expressions[iterator], commands[iterator])
+        command_predicate, command_parameters = process_command(expressions[iterator], commands[iterator])
+        results.append((command_predicate, command_parameters))
+    return results
 
 
 def process_queries(expressions):
@@ -145,15 +169,16 @@ def process_completion(completion):
     completion = completion.replace("'", "\"")
     json_completion = json.loads(completion)
     if json_completion['type'] == ExpressionType.query.value:
-        process_queries(json_completion['expressions'])
+        return process_queries(json_completion['expressions'])
     elif json_completion['type'] == ExpressionType.command.value:
-        process_commands(json_completion['expressions'], json_completion['commands'])
+        return process_commands(json_completion['expressions'], json_completion['commands'])
     else:
         logger.error('Invalid type')
 
 
 def main():
-    process_completion(generate_completion('Fetch 2 onions'))
+    # process_completion(generate_completion('Fetch 2 onions'))
+    print(process_completion(generate_completion('There are 2 times more medium bowls than large bowl')))
 
 
 if __name__ == "__main__":

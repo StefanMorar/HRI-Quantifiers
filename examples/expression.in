@@ -1,3 +1,0 @@
-formulas(commands).
-	exists x (box(x)).
-end_of_list.
