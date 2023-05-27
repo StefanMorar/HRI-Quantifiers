@@ -1,3 +1,3 @@
 formulas(commands).
-	exists x (tool(x)).
+	exists x0 (abe(x0) & cut(x0, RedOnion1, CookingKnife)).
 end_of_list.

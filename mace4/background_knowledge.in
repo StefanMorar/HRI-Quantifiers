@@ -1,0 +1,188 @@
+assign(max_models, -1).
+set(arithmetic).
+
+formulas(background_knowledge_classification).
+    kitchenUnit(x) -> kitchenware(x).
+    kitchenTool(x) -> kitchenware(x).
+    cookingAppliance(x) -> kitchenware(x).
+    bakingSupply(x) -> kitchenware(x).
+
+    kitchenCounter(x) -> kitchenUnit(x).
+    kitchenCabinet(x) -> kitchenUnit(x).
+
+    oven(x) -> cookingAppliance(x).
+
+    bakingSheet(x) -> bakingSupply(x).
+
+    cuttingBoard(x) -> kitchenTool(x).
+    container(x) -> kitchenTool(x).
+    cuttingTool(x) -> kitchenTool(x).
+    mixingTool(x) -> kitchenTool(x).
+
+    bowl(x) -> container(x).
+    bakingTray(x) -> container(x).
+
+    largeBowl(x) -> bowl(x).
+    mediumBowl(x) -> bowl(x).
+    smallBowl(x) -> bowl(x).
+
+    cookingKnife(x) -> cuttingTool(x).
+
+    whisk(x) -> mixingTool(x).
+
+    fruit(x) -> ingredient(x).
+    vegetable(x) -> ingredient(x).
+    cheese(x) -> ingredient(x).
+    sugarBag(x) -> ingredient(x).
+    butterBag(x) -> ingredient(x).
+    bacon(x) -> ingredient(x).
+    fragment(x) -> ingredient(x).
+
+    onion(x) -> vegetable(x).
+    pepper(x) -> vegetable(x).
+    broccoli(x) -> vegetable(x).
+    carrot(x) -> vegetable(x).
+
+    mango(x) -> fruit(x).
+    banana(x) -> fruit(x).
+    avocado(x) -> fruit(x).
+    tomato(x) -> fruit(x).
+    apple(x) -> fruit(x).
+
+    peeledOnion(x) -> onion(x).
+    peeledRedOnion(x) -> onion(x).
+
+    redChiliPepper(x) -> pepper(x).
+    greenChiliPepper(x) -> pepper(x).
+
+    fetaCheese(x) -> cheese(x).
+
+    choppedOnion(x) -> fragment(x).
+    choppedRedOnion(x) -> fragment(x).
+    choppedBroccoli(x) -> fragment(x).
+    choppedBacon(x) -> fragment(x).
+end_of_list.
+
+formulas(background_knowledge_distinction).
+    abe(x) -> -ingredient(x).
+    abe(x) -> -kitchenware(x).
+    abe(x) -> -floor(x).
+    floor(x) -> -ingredient(x).
+    floor(x) -> -kitchenware(x).
+    ingredient(x) -> -kitchenware(x).
+
+    kitchenUnit(x) -> -kitchenTool(x).
+    kitchenUnit(x) -> -cookingAppliance(x).
+    kitchenUnit(x) -> -bakingSupply(x).
+    kitchenTool(x) -> -cookingAppliance(x).
+    kitchenTool(x) -> -bakingSupply(x).
+    cookingAppliance(x) -> -bakingSupply(x).
+
+    kitchenCounter(x) -> -kitchenCabinet(x).
+
+    cuttingBoard(x) -> -container(x).
+    cuttingBoard(x) -> -cuttingTool(x).
+    cuttingBoard(x) -> -mixingTool(x).
+    container(x) -> -cuttingTool(x).
+    container(x) -> -mixingTool(x).
+    cuttingTool(x) -> -mixingTool(x).
+
+    bakingTray(x) -> -bowl(x).
+
+    mediumBowl(x) -> -largeBowl(x).
+    mediumBowl(x) -> -smallBowl(x).
+    largeBowl(x) -> -smallBowl(x).
+
+    fruit(x) -> -vegetable(x).
+    fruit(x) -> -cheese(x).
+    fruit(x) -> -sugarBag(x).
+    fruit(x) -> -butterBag(x).
+    fruit(x) -> -bacon(x).
+    fruit(x) -> -fragment(x).
+    vegetable(x) -> -cheese(x).
+    vegetable(x) -> -sugarBag(x).
+    vegetable(x) -> -butterBag(x).
+    vegetable(x) -> -bacon(x).
+    vegetable(x) -> -fragment(x).
+    cheese(x) -> -sugarBag(x).
+    cheese(x) -> -butterBag(x).
+    cheese(x) -> -bacon(x).
+    cheese(x) -> -fragment(x).
+    sugarBag(x) -> -butterBag(x).
+    sugarBag(x) -> -bacon(x).
+    sugarBag(x) -> -fragment(x).
+    butterBag(x) -> -bacon(x).
+    butterBag(x) -> -fragment(x).
+    bacon(x) -> -fragment(x).
+
+    onion(x) -> -pepper(x).
+    onion(x) -> -broccoli(x).
+    onion(x) -> -carrot(x).
+    pepper(x) -> -broccoli(x).
+    pepper(x) -> -carrot(x).
+    broccoli(x) -> -carrot(x).
+
+    peeledOnion(x) -> -peeledRedOnion(x).
+
+    greenChiliPepper(x) -> -redChiliPepper(x).
+
+    mango(x) -> -banana(x).
+    mango(x) -> -avocado(x).
+    mango(x) -> -tomato(x).
+    mango(x) -> -apple(x).
+    banana(x) -> -avocado(x).
+    banana(x) -> -tomato(x).
+    banana(x) -> -apple(x).
+    avocado(x) -> -tomato(x).
+    avocado(x) -> -apple(x).
+    tomato(x) -> -apple(x).
+
+    choppedOnion(x) -> -choppedRedOnion(x).
+    choppedOnion(x) -> -choppedBroccoli(x).
+    choppedOnion(x) -> -choppedBacon(x).
+    choppedRedOnion(x) -> -choppedBroccoli(x).
+    choppedRedOnion(x) -> -choppedBacon(x).
+    choppedBroccoli(x) -> -choppedBacon(x).
+end_of_list.
+
+formulas(background_knowledge_commands).
+    abe(x0) & (ingredient(x1) | kitchenTool(x1) | bakingSupply(x1)) -> fetch(x0, x1).
+    -abe(x0) -> -fetch(x0, x1).
+    -ingredient(x1) & -kitchenTool(x1) & -bakingSupply(x1) -> -fetch(x0, x1).
+
+    abe(x0) & ingredient(x1) & cuttingTool(x2) -> cut(x0, x1, x2).
+    -abe(x0) -> -cut(x0, x1, x2).
+    -ingredient(x1) -> -cut(x0, x1, x2).
+    -cuttingTool(x2) -> -cut(x0, x1, x2).
+
+    abe(x0) & bakingSheet(x1) & bakingTray(x2) -> line(x0, x1, x2).
+    -abe(x0) -> -line(x0, x1, x2).
+    -bakingSheet(x1) -> -line(x0, x1, x2).
+    -bakingTray(x2) -> -line(x0, x1, x2).
+
+    abe(x0) & bowl(x1) & mixingTool(x2) -> mix(x0, x1, x2).
+    -abe(x0) -> -mix(x0, x1, x2).
+    -bowl(x1) -> -mix(x0, x1, x2).
+    -mixingTool(x2) -> -mix(x0, x1, x2).
+
+    abe(x0) & container(x1) & container(x2) -> transfer(x0, x1, x2).
+    -abe(x0) -> -transfer(x0, x1, x2).
+    -container(x1) -> -transfer(x0, x1, x2).
+    -container(x2) -> -transfer(x0, x1, x2).
+
+    abe(x0) & sugarBag(x1) & bakingTray(x2) -> sprinkle(x0, x1, x2).
+    -abe(x0) -> -sprinkle(x0, x1, x2).
+    -sugarBag(x1) -> -sprinkle(x0, x1, x2).
+    -bakingTray(x2) -> -sprinkle(x0, x1, x2).
+
+    abe(x0) & container(x1) & container(x2) -> shape(x0, x1, x2).
+    -abe(x0) -> -shape(x0, x1, x2).
+    -container(x1) -> -shape(x0, x1, x2).
+    -container(x2) -> -shape(x0, x1, x2).
+
+    abe(x0) & container(x1) & oven(x2) & kitchenCounter(x3) -> bake(x0, x1, x2, x3).
+    -abe(x0) -> -bake(x0, x1, x2, x3).
+    -container(x1) -> -bake(x0, x1, x2, x3).
+    -oven(x2) -> -bake(x0, x1, x2, x3).
+    -kitchenCounter(x3) -> -bake(x0, x1, x2, x3).
+end_of_list.
