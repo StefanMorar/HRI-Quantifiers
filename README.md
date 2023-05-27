@@ -20,7 +20,7 @@
 
 ## Execution
 
-In the root folder of the repository, run `python3 main.py`.
+In the root folder of the repository, run `python3 src/main.py`.
 
 Alternatively, each component can be executed independently:
 
