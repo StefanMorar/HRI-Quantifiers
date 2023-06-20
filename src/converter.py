@@ -28,8 +28,8 @@ def get_max_tokens():
 
 def generate_completion(sentence):
     try:
-        res = openai.Completion.create(model=model, prompt=sentence + ' ->', stop=']}', max_tokens=get_max_tokens())
-        completion = res.choices[0].text + ']}'
+        res = openai.Completion.create(model=model, prompt=sentence + ' ->', stop='}', max_tokens=get_max_tokens())
+        completion = res.choices[0].text + '}'
         logger.debug(f'GPT-3 completion: {completion}')
         return completion
         # hardcoded conversion to reduce usage costs
@@ -116,7 +116,7 @@ def get_command_parameters(predicate_arguments, variable_values_dictionary, vari
 
 def prepare_command(expressions, command):
     predicate, expression, predicate_arguments = preprocess_command(command)
-    logger.debug(f'Evaluating {expression}...')
+    logger.debug(f"Evaluating '{expression}'...")
 
     if evaluate_fol_expression(expression, ExpressionType.command) < 1:
         return None
