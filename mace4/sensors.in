@@ -1,8 +1,12 @@
 assign(domain_size, 22).
 
+list(distinct).
+	[Floor, Abe, KitchenCounter, KitchenCabinet, Oven, CuttingBoard, BakingTray1, BakingTray2, BakingSheet1, BakingSheet2, Whisk, CookingKnife, BrownOnion, RedOnion1, RedOnion2, Broccoli1, Broccoli2, SugarBag, ButterBag, LargeBowl, MediumBowl1, MediumBowl2].
+end_of_list.
+
 formulas(sensors).
 	floor(Floor).
-	abe(Abe).
+	robot(Abe).
 	kitchenCounter(KitchenCounter).
 	kitchenCabinet(KitchenCabinet).
 	oven(Oven).
@@ -23,5 +27,4 @@ formulas(sensors).
 	largeBowl(LargeBowl).
 	mediumBowl(MediumBowl1).
 	mediumBowl(MediumBowl2).
-	Floor = 0. Abe = 1. KitchenCounter = 2. KitchenCabinet = 3. Oven = 4. CuttingBoard = 5. BakingTray1 = 6. BakingTray2 = 7. BakingSheet1 = 8. BakingSheet2 = 9. Whisk = 10. CookingKnife = 11. BrownOnion = 12. RedOnion1 = 13. RedOnion2 = 14. Broccoli1 = 15. Broccoli2 = 16. SugarBag = 17. ButterBag = 18. LargeBowl = 19. MediumBowl1 = 20. MediumBowl2 = 21. 
 end_of_list.

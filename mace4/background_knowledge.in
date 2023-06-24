@@ -1,5 +1,4 @@
 assign(max_models, -1).
-set(arithmetic).
 
 formulas(background_knowledge_classification).
     kitchenUnit(x) -> kitchenware(x).
@@ -64,9 +63,9 @@ formulas(background_knowledge_classification).
 end_of_list.
 
 formulas(background_knowledge_distinction).
-    abe(x) -> -ingredient(x).
-    abe(x) -> -kitchenware(x).
-    abe(x) -> -floor(x).
+    robot(x) -> -ingredient(x).
+    robot(x) -> -kitchenware(x).
+    robot(x) -> -floor(x).
     floor(x) -> -ingredient(x).
     floor(x) -> -kitchenware(x).
     ingredient(x) -> -kitchenware(x).
@@ -146,42 +145,42 @@ formulas(background_knowledge_distinction).
 end_of_list.
 
 formulas(background_knowledge_commands).
-    abe(x0) & (ingredient(x1) | kitchenTool(x1) | bakingSupply(x1)) -> fetch(x0, x1).
-    -abe(x0) -> -fetch(x0, x1).
+    robot(x0) & (ingredient(x1) | kitchenTool(x1) | bakingSupply(x1)) -> fetch(x0, x1).
+    -robot(x0) -> -fetch(x0, x1).
     -ingredient(x1) & -kitchenTool(x1) & -bakingSupply(x1) -> -fetch(x0, x1).
 
-    abe(x0) & ingredient(x1) & cuttingTool(x2) -> cut(x0, x1, x2).
-    -abe(x0) -> -cut(x0, x1, x2).
+    robot(x0) & ingredient(x1) & cuttingTool(x2) -> cut(x0, x1, x2).
+    -robot(x0) -> -cut(x0, x1, x2).
     -ingredient(x1) -> -cut(x0, x1, x2).
     -cuttingTool(x2) -> -cut(x0, x1, x2).
 
-    abe(x0) & bakingSheet(x1) & bakingTray(x2) -> line(x0, x1, x2).
-    -abe(x0) -> -line(x0, x1, x2).
+    robot(x0) & bakingSheet(x1) & bakingTray(x2) -> line(x0, x1, x2).
+    -robot(x0) -> -line(x0, x1, x2).
     -bakingSheet(x1) -> -line(x0, x1, x2).
     -bakingTray(x2) -> -line(x0, x1, x2).
 
-    abe(x0) & bowl(x1) & mixingTool(x2) -> mix(x0, x1, x2).
-    -abe(x0) -> -mix(x0, x1, x2).
+    robot(x0) & bowl(x1) & mixingTool(x2) -> mix(x0, x1, x2).
+    -robot(x0) -> -mix(x0, x1, x2).
     -bowl(x1) -> -mix(x0, x1, x2).
     -mixingTool(x2) -> -mix(x0, x1, x2).
 
-    abe(x0) & container(x1) & container(x2) -> transfer(x0, x1, x2).
-    -abe(x0) -> -transfer(x0, x1, x2).
+    robot(x0) & container(x1) & container(x2) -> transfer(x0, x1, x2).
+    -robot(x0) -> -transfer(x0, x1, x2).
     -container(x1) -> -transfer(x0, x1, x2).
     -container(x2) -> -transfer(x0, x1, x2).
 
-    abe(x0) & sugarBag(x1) & bakingTray(x2) -> sprinkle(x0, x1, x2).
-    -abe(x0) -> -sprinkle(x0, x1, x2).
+    robot(x0) & sugarBag(x1) & bakingTray(x2) -> sprinkle(x0, x1, x2).
+    -robot(x0) -> -sprinkle(x0, x1, x2).
     -sugarBag(x1) -> -sprinkle(x0, x1, x2).
     -bakingTray(x2) -> -sprinkle(x0, x1, x2).
 
-    abe(x0) & container(x1) & container(x2) -> shape(x0, x1, x2).
-    -abe(x0) -> -shape(x0, x1, x2).
+    robot(x0) & container(x1) & container(x2) -> shape(x0, x1, x2).
+    -robot(x0) -> -shape(x0, x1, x2).
     -container(x1) -> -shape(x0, x1, x2).
     -container(x2) -> -shape(x0, x1, x2).
 
-    abe(x0) & container(x1) & oven(x2) & kitchenCounter(x3) -> bake(x0, x1, x2, x3).
-    -abe(x0) -> -bake(x0, x1, x2, x3).
+    robot(x0) & container(x1) & oven(x2) & kitchenCounter(x3) -> bake(x0, x1, x2, x3).
+    -robot(x0) -> -bake(x0, x1, x2, x3).
     -container(x1) -> -bake(x0, x1, x2, x3).
     -oven(x2) -> -bake(x0, x1, x2, x3).
     -kitchenCounter(x3) -> -bake(x0, x1, x2, x3).

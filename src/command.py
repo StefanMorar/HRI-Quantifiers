@@ -9,7 +9,9 @@ def filter_predicates(kitchen_state):
     for item in kitchen_state.values():
         object_type = item['type']
         object_name = item['name']
-        if "owl:" not in object_type and "Particle" not in object_type:
+        if object_type == 'Abe':
+            predicates.append(('Robot', object_name))
+        elif 'owl:' not in object_type and 'Particle' not in object_type:
             predicates.append((object_type, object_name))
     return predicates
 
@@ -23,6 +25,14 @@ def set_state(response, state_out):
         kitchen_state = response['kitchenStateOut']
     predicates = filter_predicates(kitchen_state)
     prepare_sensors_file(predicates)
+
+
+def initialize_state():
+    if not service.has_state:
+        logger.debug(f'Setting initial kitchen state...')
+        response = service.to_get_state()
+        set_state(response, False)
+        service.has_state = True
 
 
 def fetch(parameters):
@@ -93,10 +103,7 @@ def execute_command(predicate, parameters):
     logger.debug(f'Executing command {predicate} with parameters {parameters}')
     parameters = [[to_lowercase_first_character_string(item) for item in sublist] for sublist in parameters]
 
-    if not service.has_state:
-        response = service.to_get_state()
-        set_state(response, False)
-        service.has_state = True
+    initialize_state()
 
     command_functions = {
         'fetch': fetch,

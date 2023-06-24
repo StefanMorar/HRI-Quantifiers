@@ -22,7 +22,7 @@ def prepare_expression_file(expression, execution_type):
     with open(expression_file_path, 'w') as file:
         if execution_type == ExpressionType.query:
             file.write('clear(print_models).\n\n')
-        file.write('formulas(commands).\n')
+        file.write('formulas(expressions).\n')
         file.write(f'\t{expression}\n')
         file.write('end_of_list.')
 
@@ -30,16 +30,21 @@ def prepare_expression_file(expression, execution_type):
 def prepare_sensors_file(predicates):
     with open(sensors_file_path, 'w') as file:
         file.write(f'assign(domain_size, {len(predicates)}).\n\n')
+
+        file.write('list(distinct).\n\t[')
+        for i, item in enumerate(predicates):
+            variable = to_uppercase_first_character_string(item[1])
+            if i < len(predicates) - 1:
+                file.write(f'{variable}, ')
+            else:
+                file.write(f'{variable}].\nend_of_list.\n\n')
+
         file.write('formulas(sensors).\n')
         for item in predicates:
             predicate = to_lowercase_first_character_string(item[0])
             variable = to_uppercase_first_character_string(item[1])
             file.write(f'\t{predicate}({variable}).\n')
-        file.write('\t')
-        for i, item in enumerate(predicates):
-            variable = to_uppercase_first_character_string(item[1])
-            file.write(f'{variable} = {i}. ')
-        file.write('\nend_of_list.')
+        file.write('end_of_list.')
 
 
 def evaluate_fol_expression(expression, execution_type):
