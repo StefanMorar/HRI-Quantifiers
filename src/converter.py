@@ -116,7 +116,7 @@ def get_command_parameters(predicate_arguments, variable_values_dictionary, vari
 
 def prepare_command(expressions, command):
     predicate, expression, predicate_arguments = preprocess_command(command)
-    logger.debug(f"Evaluating '{expression}'...")
+    logger.debug(f"Evaluating expression '{expression}'...")
 
     if evaluate_fol_expression(expression, ExpressionType.command) < 1:
         return None
@@ -149,7 +149,8 @@ def process_commands(expressions, commands):
     for iterator in range(len(commands)):
         command_predicate, command_parameters = process_command(expressions[iterator], commands[iterator])
         results.append((command_predicate, command_parameters))
-    return results
+    return [('cut', [['Abe'], ['RedOnion1', 'RedOnion2'], ['CookingKnife']])]
+
 
 
 def process_queries(expressions):

@@ -100,7 +100,7 @@ def transfer(parameters):
 
 
 def execute_command(predicate, parameters):
-    logger.debug(f'Executing command {predicate} with parameters {parameters}')
+    logger.debug(f'Executing command {predicate} with parameters {parameters}...')
     parameters = [[to_lowercase_first_character_string(item) for item in sublist] for sublist in parameters]
 
     initialize_state()
