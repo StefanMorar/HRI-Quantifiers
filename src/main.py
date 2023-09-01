@@ -10,7 +10,7 @@ def listen():
             completion = generate_completion(sentence)
             if completion is None:
                 continue
-            print(process_completion(completion))
+            print('Result:', process_completion(completion))
         else:
             break
 
