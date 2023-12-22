@@ -67,7 +67,7 @@
 "Move Bowl3 to Bowl2","{'type':'command','expressions':[[]],'commands':['robot(x0) -> transfer(x0, Bowl3, Bowl2).']}"
 "Transfer bowl21 and bowl52 to bowl12","{'type':'command','expressions':[[],[]],'commands':['robot(x0) -> transfer(x0, Bowl21, Bowl12).','robot(x0) -> transfer(x0, Bowl52, Bowl12).']}"
 "Shift contents of SmallBowl1 to another small bowl","{'type':'command','expressions':[['|exists x2 (smallBowl(x2)).| >= 1']],'commands':['robot(x0) & smallBowl(x2) -> transfer(x0, SmallBowl1, x2).']}"
-"Transfer the contents of medium bowl B1 to a baking tray","{'type':'command','expressions':[['|exists x2 (bakingTray(x2)).| >= 1']],'commands':['robot(x0) & mediumBowl(Bowl1) & bakingTray(x2) -> transfer(x0, B1, x2).']}"
+"Transfer the contents of medium bowl B1 to a baking tray","{'type':'command','expressions':[['|exists x2 (bakingTray(x2)).| >= 1']],'commands':['robot(x0) & mediumBowl(B1) & bakingTray(x2) -> transfer(x0, B1, x2).']}"
 "Move contents of small bowl bowl1 to baking tray tray1","{'type':'command','expressions':[[]],'commands':['robot(x0) & smallBowl(Bowl1) & bakingTray(Tray1) -> transfer(x0, Bowl1, Tray1).']}"
 "Sprinkle powdered sugar over Tray10","{'type':'command','expressions':[['|exists x1 (powderedSugar(x1)).| >= 1']],'commands':['robot(x0) & powderedSugar(x1) -> sprinkle(x0, x1, Tray10).']}"
 "Sprinkle powdered sugar over baking tray BT1","{'type':'command','expressions':[['|exists x1 (powderedSugar(x1)).| >= 1']],'commands':['robot(x0) & powderedSugar(x1) & bakingTray(BT1) -> sprinkle(x0, x1, BT1).']}"
