@@ -3,19 +3,12 @@ import os
 
 from dotenv import load_dotenv
 
+from utils import string_to_bool
+
 load_dotenv()
-debugging_enabled = os.getenv('DEBUGGING_ENABLED')
+is_debug_enabled = os.getenv('IS_DEBUG_ENABLED')
 
 formatter = logging.Formatter('%(asctime)s -  %(filename)s:%(lineno)d - %(funcName)s - %(levelname)s - %(message)s')
-
-
-def string_to_bool(string):
-    if string.lower() in ['true', 'yes', '1']:
-        return True
-    elif string.lower() in ['false', 'no', '0']:
-        return False
-    else:
-        raise ValueError("Invalid boolean string")
 
 
 def setup_logging(debug_enabled):
@@ -33,7 +26,7 @@ def setup_logging(debug_enabled):
 
 
 def get_logger():
-    configuration = string_to_bool(debugging_enabled)
+    configuration = string_to_bool(is_debug_enabled)
     return setup_logging(configuration)
 
 

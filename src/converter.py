@@ -7,15 +7,19 @@ from dotenv import load_dotenv
 from openai.error import OpenAIError
 
 from command import execute_command
-from enums import ExpressionType
-from evaluator import evaluate_fol_cardinality_expression, evaluate_fol_expression
+from enums import ExpressionType, EvaluationType
+from evaluator import evaluate_fol_cardinality_expression
 from logger import logger
 from model_selector import get_variables_as_constants_by_key
+from utils import string_to_bool
 
 load_dotenv()
 openai.api_key = os.getenv('OPENAI_API_KEY')
 model = os.getenv('OPENAI_FINE_TUNED_MODEL')
 max_tokens = os.getenv('OPENAI_FINE_TUNED_MAX_TOKENS')
+
+is_openai_call_mocked = os.getenv('IS_OPENAI_CALL_MOCKED')
+mocked_openai_completion = os.getenv('MOCKED_OPENAI_COMPLETION')
 
 
 def get_max_tokens():
@@ -27,16 +31,18 @@ def get_max_tokens():
 
 
 def generate_completion(sentence):
-    try:
-        res = openai.Completion.create(model=model, prompt=sentence + ' ->', stop='}', max_tokens=get_max_tokens())
-        completion = res.choices[0].text + '}'
-        logger.debug(f'GPT-3 completion: {completion}')
-        return completion
-        # hardcoded conversion to reduce usage costs
-        # return "{'type':'command','expressions':[['|exists x1 (onion(x1)).| >= 2']],'commands':['abe(x0) & onion(x1) -> fetch(x0, x1).']}"
-    except OpenAIError as e:
-        logger.error(json.dumps(e.error))
-        return None
+    if string_to_bool(is_openai_call_mocked):
+        logger.debug(f'Mocked GPT-3 completion: {mocked_openai_completion}')
+        return mocked_openai_completion
+    else:
+        try:
+            res = openai.Completion.create(model=model, prompt=sentence + ' ->', stop='}', max_tokens=get_max_tokens())
+            completion = res.choices[0].text + '}'
+            logger.debug(f'GPT-3 completion: {completion}')
+            return completion
+        except OpenAIError as e:
+            logger.error(json.dumps(e.error))
+            return None
 
 
 def create_variable_restrictions_dictionary(expressions):
@@ -118,8 +124,8 @@ def prepare_command(expressions, command):
     predicate, expression, predicate_arguments = preprocess_command(command)
     logger.debug(f"Evaluating expression '{expression}'...")
 
-    if evaluate_fol_expression(expression, ExpressionType.command) < 1:
-        return None
+    if evaluate_fol_cardinality_expression(expression, EvaluationType.with_models) < 1:
+        return None, None
 
     variables = get_command_variables(predicate_arguments)
 
@@ -136,6 +142,8 @@ def prepare_command(expressions, command):
 
 def process_command(expressions, command):
     predicate, command_parameters = prepare_command(expressions, command)
+    if predicate is None:
+        return 'Syntax error or unknown predicates', []
 
     execute_command(predicate, command_parameters)
 
@@ -149,14 +157,13 @@ def process_commands(expressions, commands):
     for iterator in range(len(commands)):
         command_predicate, command_parameters = process_command(expressions[iterator], commands[iterator])
         results.append((command_predicate, command_parameters))
-    return [('cut', [['Abe'], ['RedOnion1', 'RedOnion2'], ['CookingKnife']])]
-
+    return results
 
 
 def process_queries(expressions):
     results = []
     for expression in expressions:
-        evaluation = evaluate_fol_cardinality_expression(expression)
+        evaluation = evaluate_fol_cardinality_expression(expression, EvaluationType.without_models)
         if evaluation == -3:
             results.append('Syntax error while processing the query')
         elif evaluation == -2:
@@ -178,7 +185,7 @@ def process_completion(completion):
 
 
 def main():
-    # process_completion(generate_completion('Fetch 2 onions'))
+    # Examples
     print(process_completion(generate_completion('There are 2 times more medium bowls than large bowl')))
 
 
